@@ -15,6 +15,9 @@ const TARGETS = [
   ['dataflow', 'product-analytics.dataflow.json', 'dataflow-product-analytics.html'],
   ['lifecycle', 'agent-run.lifecycle.json', 'lifecycle-agent-run.html'],
   ['architecture', 'web-app.architecture.json', 'web-app-rendered.html'],
+  ['domain', 'order-management.domain.json', 'domain-order-management.html'],
+  ['erd', 'order-management.erd.json', 'erd-order-management.html'],
+  ['http-call', 'storefront.http-call.json', 'http-call-storefront.html'],
 ];
 
 for (const [mode, input, output] of TARGETS) {

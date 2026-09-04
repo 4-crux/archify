@@ -118,7 +118,7 @@ test('relationship lens is keyboard navigable, mobile-pinned, and excluded from 
   assert.match(html, /html\[data-embed="true"\] \.focus-chip/);
   assert.match(html, /\.toolbar, \.diagram-nav, \.focus-chip, \.guided-views/);
   assert.match(html, /chip\.hidden = options\.hideChip === true \|\| normalized\.length !== 1 \|\| selectionMode/);
-  assert.match(html, /event\.target\.closest\('\.diagram-nav, \.focus-chip, \.node-finder, \.diagram-guide, \.overview-map, \.route-probe, \.semantic-lens'\)/);
+  assert.match(html, /event\.target\.closest\('\.diagram-nav, \.focus-chip, \.node-finder, \.diagram-guide, \.overview-map, \.route-probe, \.semantic-lens, \.change-notes'\)/);
   assert.match(html, /function placeRelationshipLens\(\)/);
   assert.match(html, /visibleTop = Math\.max\(padding, -containerRect\.top \+ padding\)/);
   assert.match(html, /window\.addEventListener\('scroll', requestLensPlacement, \{ passive: true \}\)/);

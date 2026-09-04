@@ -78,17 +78,32 @@ function sourceLineCount(content) {
   return lines.length - (/(?:\r\n|\n|\r)$/.test(content) ? 1 : 0);
 }
 
+// Source evidence is node-scoped. Each supported diagram type names the
+// collection whose members may carry `sources`.
+export const EVIDENCE_COLLECTIONS = {
+  architecture: 'components',
+  domain: 'entities',
+  erd: 'tables',
+  'http-call': 'components',
+};
+
+export function evidenceCollection(diagramType) {
+  return EVIDENCE_COLLECTIONS[diagramType] || null;
+}
+
 export function hasRepositoryEvidence(diagramType, diagram) {
-  if (diagramType !== 'architecture') return false;
-  const components = Array.isArray(diagram?.components) ? diagram.components : [];
+  const collection = evidenceCollection(diagramType);
+  if (!collection) return false;
+  const components = Array.isArray(diagram?.[collection]) ? diagram[collection] : [];
   return Boolean(diagram?.meta?.repository) || components.some((component) => Array.isArray(component?.sources) && component.sources.length);
 }
 
 export function verifyRepositoryEvidence(diagramType, diagram, repoRootInput) {
   if (!hasRepositoryEvidence(diagramType, diagram)) return null;
-  if (diagramType !== 'architecture') evidenceFailure('repository-evidence/type-unsupported', 'Repository evidence is currently supported for architecture diagrams only.', {
+  const collection = evidenceCollection(diagramType);
+  if (!collection) evidenceFailure('repository-evidence/type-unsupported', 'Repository evidence is currently supported for architecture, domain, erd, and http-call diagrams only.', {
     subject: { diagramType },
-    supportedFixes: ['use architecture mode or remove repository evidence'],
+    supportedFixes: ['use architecture, domain, erd, or http-call mode or remove repository evidence'],
   });
 
   const repository = diagram.meta?.repository;
@@ -158,12 +173,12 @@ export function verifyRepositoryEvidence(diagramType, diagram, repoRootInput) {
 
   const nodes = Object.create(null);
   let referenceCount = 0;
-  const components = Array.isArray(diagram.components) ? diagram.components : [];
+  const components = Array.isArray(diagram[collection]) ? diagram[collection] : [];
   for (const [componentIndex, component] of components.entries()) {
     if (!Array.isArray(component.sources) || component.sources.length === 0) continue;
     const verified = [];
     for (const [sourceIndex, authored] of component.sources.entries()) {
-      const where = `/components/${componentIndex}/sources/${sourceIndex}/path`;
+      const where = `/${collection}/${componentIndex}/sources/${sourceIndex}/path`;
       const source = {
         path: verifiedSourcePath(authored.path, where),
         ...(authored.line ? { line: authored.line } : {}),
@@ -171,14 +186,14 @@ export function verifyRepositoryEvidence(diagramType, diagram, repoRootInput) {
         ...(authored.label ? { label: authored.label } : {}),
       };
       if (source.endLine && !source.line) {
-        evidenceFailure('repository-evidence/line-required', `/components/${componentIndex}/sources/${sourceIndex}/end_line requires line.`, {
-          subject: { path: `/components/${componentIndex}/sources/${sourceIndex}/end_line`, componentId: component.id },
+        evidenceFailure('repository-evidence/line-required', `/${collection}/${componentIndex}/sources/${sourceIndex}/end_line requires line.`, {
+          subject: { path: `/${collection}/${componentIndex}/sources/${sourceIndex}/end_line`, componentId: component.id },
           supportedFixes: ['add line or remove end_line'],
         });
       }
       if (source.endLine && source.endLine < source.line) {
-        evidenceFailure('repository-evidence/line-range-invalid', `/components/${componentIndex}/sources/${sourceIndex}/end_line must be greater than or equal to line.`, {
-          subject: { path: `/components/${componentIndex}/sources/${sourceIndex}`, componentId: component.id },
+        evidenceFailure('repository-evidence/line-range-invalid', `/${collection}/${componentIndex}/sources/${sourceIndex}/end_line must be greater than or equal to line.`, {
+          subject: { path: `/${collection}/${componentIndex}/sources/${sourceIndex}`, componentId: component.id },
           evidence: { line: source.line, endLine: source.endLine },
           supportedFixes: ['use an end_line greater than or equal to line'],
         });
@@ -202,8 +217,8 @@ export function verifyRepositoryEvidence(diagramType, diagram, repoRootInput) {
         const lineCount = sourceLineCount(content.stdout);
         const requestedLine = source.endLine || source.line;
         if (requestedLine > lineCount) {
-          evidenceFailure('repository-evidence/line-out-of-range', `/components/${componentIndex}/sources/${sourceIndex} requests line ${requestedLine}, but ${source.path} has ${lineCount} lines at revision ${revision}.`, {
-            subject: { path: `/components/${componentIndex}/sources/${sourceIndex}`, componentId: component.id },
+          evidenceFailure('repository-evidence/line-out-of-range', `/${collection}/${componentIndex}/sources/${sourceIndex} requests line ${requestedLine}, but ${source.path} has ${lineCount} lines at revision ${revision}.`, {
+            subject: { path: `/${collection}/${componentIndex}/sources/${sourceIndex}`, componentId: component.id },
             evidence: { sourcePath: source.path, requestedLine, lineCount, revision },
             supportedFixes: ['use a line range that exists at the pinned revision'],
           });

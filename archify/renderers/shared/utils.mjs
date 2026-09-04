@@ -123,8 +123,13 @@ const TEMPLATE_PLACEHOLDERS = [
   GUIDED_VIEWS_PLACEHOLDER,
 ];
 
+// Optional: older custom templates may omit the diagram-type meta tag. The
+// viewer's Change Notes report falls back to "diagram" when it is absent.
+const DIAGRAM_TYPE_PLACEHOLDER = '<meta name="archify-diagram-type" content="[DIAGRAM TYPE]">';
+
 export function applyTemplate(template, {
   title,
+  diagramType = 'diagram',
   subtitle,
   svg,
   cards,
@@ -171,6 +176,7 @@ export function applyTemplate(template, {
     .replace(TEMPLATE_PLACEHOLDERS[0], () => `<html lang="${esc(resolvedLocale)}" data-theme="dark" data-preset="${esc(visualPreset)}">`)
     .replace(TEMPLATE_PLACEHOLDERS[1], () => `<title>${esc(translateMessage(resolvedLocale, 'page.title', { title }))}</title>`)
     .replace(TEMPLATE_PLACEHOLDERS[2], () => `<h1>${esc(title)}</h1>`)
+    .replace(DIAGRAM_TYPE_PLACEHOLDER, () => `<meta name="archify-diagram-type" content="${esc(diagramType)}">`)
     .replace(SUBTITLE_SLOT_RE, (_match, indent, newline = '') => renderedSubtitle
       ? `${indent}${renderedSubtitle}${newline}`
       : '')

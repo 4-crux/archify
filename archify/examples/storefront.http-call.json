@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "diagram_type": "http-call",
+  "meta": {
+    "title": "Storefront HTTP Calls",
+    "output": "examples/http-call-storefront.html",
+    "quality_profile": "showcase",
+    "detail": "full",
+    "views": [
+      {
+        "id": "checkout",
+        "label": "Checkout path",
+        "focus": [
+          "web",
+          "gateway",
+          "orders",
+          "payments"
+        ],
+        "note": "The web app posts an order through the gateway; orders charges the card via payments."
+      },
+      {
+        "id": "catalog",
+        "label": "Catalog reads",
+        "focus": [
+          "mobile",
+          "gateway",
+          "catalog"
+        ],
+        "note": "Both clients read the catalog through the same gateway route."
+      }
+    ]
+  },
+  "layout": {
+    "mode": "grid",
+    "cols": 4,
+    "gapX": 120,
+    "gapY": 52
+  },
+  "zones": [
+    {
+      "id": "clients",
+      "label": "Clients",
+      "kind": "client",
+      "wraps": [
+        "web",
+        "mobile"
+      ]
+    },
+    {
+      "id": "platform",
+      "label": "Platform · api.example.com",
+      "kind": "platform",
+      "wraps": [
+        "gateway",
+        "catalog",
+        "orders",
+        "payments"
+      ]
+    }
+  ],
+  "components": [
+    {
+      "id": "web",
+      "kind": "frontend",
+      "label": "Web App",
+      "base_url": "shop.example.com",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "id": "mobile",
+      "kind": "frontend",
+      "label": "Mobile App",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "id": "gateway",
+      "kind": "gateway",
+      "label": "API Gateway",
+      "base_url": "api.example.com",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "id": "catalog",
+      "kind": "service",
+      "label": "Catalog Service",
+      "row": 0,
+      "col": 2
+    },
+    {
+      "id": "orders",
+      "kind": "service",
+      "label": "Orders Service",
+      "row": 1,
+      "col": 2
+    },
+    {
+      "id": "payments",
+      "kind": "external",
+      "label": "Payments Provider",
+      "base_url": "api.payments.io",
+      "row": 1,
+      "col": 3
+    }
+  ],
+  "calls": [
+    {
+      "id": "web-catalog",
+      "from": "web",
+      "to": "gateway",
+      "method": "GET",
+      "path": "/v1/products",
+      "request": {
+        "fields": [
+          "q",
+          "page"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "schema": "ProductPage"
+      }
+    },
+    {
+      "id": "web-order",
+      "from": "web",
+      "to": "gateway",
+      "method": "POST",
+      "path": "/v1/orders",
+      "auth": "Bearer JWT",
+      "request": {
+        "content_type": "application/json",
+        "schema": "CreateOrder"
+      },
+      "response": {
+        "status": 201,
+        "schema": "Order"
+      }
+    },
+    {
+      "id": "mobile-catalog",
+      "from": "mobile",
+      "to": "gateway",
+      "method": "GET",
+      "path": "/v1/products",
+      "response": {
+        "status": 200,
+        "schema": "ProductPage"
+      }
+    },
+    {
+      "id": "gateway-catalog",
+      "from": "gateway",
+      "to": "catalog",
+      "method": "GET",
+      "path": "/products",
+      "request": {
+        "fields": [
+          "q",
+          "page"
+        ]
+      },
+      "response": {
+        "status": 200,
+        "schema": "ProductPage"
+      }
+    },
+    {
+      "id": "gateway-orders",
+      "from": "gateway",
+      "to": "orders",
+      "method": "POST",
+      "path": "/orders",
+      "request": {
+        "schema": "CreateOrder"
+      },
+      "response": {
+        "status": 201,
+        "schema": "Order"
+      },
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "orders-payments",
+      "from": "orders",
+      "to": "payments",
+      "method": "POST",
+      "path": "/charges",
+      "auth": "API key",
+      "request": {
+        "schema": "ChargeRequest"
+      },
+      "response": {
+        "status": 200,
+        "schema": "Charge"
+      }
+    },
+    {
+      "id": "orders-cancel",
+      "from": "gateway",
+      "to": "orders",
+      "method": "DELETE",
+      "path": "/orders/{id}",
+      "response": {
+        "status": 204
+      },
+      "fromSide": "bottom",
+      "toSide": "left"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Entry points",
+      "dot": "cyan",
+      "items": [
+        "Every client call enters through the gateway",
+        "Catalog reads are unauthenticated"
+      ]
+    },
+    {
+      "title": "Writes",
+      "dot": "emerald",
+      "items": [
+        "POST /v1/orders requires a Bearer JWT",
+        "Orders charges the card synchronously"
+      ]
+    },
+    {
+      "title": "External",
+      "dot": "slate",
+      "items": [
+        "Payments Provider is called with an API key",
+        "No client talks to payments directly"
+      ]
+    }
+  ]
+}

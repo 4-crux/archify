@@ -10,15 +10,15 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const skillRoot = path.resolve(__dirname, '..');
 
-const TYPES = new Set(['architecture', 'workflow', 'sequence', 'dataflow', 'lifecycle']);
+const TYPES = new Set(['architecture', 'workflow', 'sequence', 'dataflow', 'lifecycle', 'domain', 'erd', 'http-call']);
 
 function usage() {
   return `Usage:
-  archify render <type> <input.json> [output.html] [--quality standard|showcase] [--repo-root path (architecture only)]
+  archify render <type> <input.json> [output.html] [--quality standard|showcase] [--repo-root path (architecture, domain, erd, http-call)] [--detail level (domain, erd, http-call)]
   archify compare architecture <base.json> <head.json> [output.html] [--receipt path] [--json] [--quality standard|showcase] [--repo-root path]
-  archify deliver <type> <input.json> [output.html] [--json] [--open] [--quality standard|showcase] [--repo-root path (architecture only)]
+  archify deliver <type> <input.json> [output.html] [--json] [--open] [--quality standard|showcase] [--repo-root path] [--only-diff[=range]] [--diff-neighbors]
   archify preview <type> <input.json> [output.html] [--no-open] [--quality standard|showcase] [--repo-root path (architecture only)]
-  archify validate <type> <input.json> [--json] [--layout-json] [--quality standard|showcase] [--repo-root path (architecture only)]
+  archify validate <type> <input.json> [--json] [--layout-json] [--quality standard|showcase] [--repo-root path] [--only-diff[=range]] [--diff-neighbors]
   archify migrate workflow <old.json> <new.json> --to-schema 2 [--json]
   archify inspect <type> <input.json>
   archify check <output.html>
@@ -31,7 +31,7 @@ function usage() {
   archify demo [output-directory]
 
 Types:
-  architecture, workflow, sequence, dataflow, lifecycle
+  architecture, workflow, sequence, dataflow, lifecycle, domain, erd, http-call
 `;
 }
 
@@ -56,11 +56,44 @@ function runNode(args, options = {}) {
   });
 }
 
+// Renderer-only options that ride along with --quality on every command.
+// --detail chooses the authored detail level for domain and erd diagrams.
+const MODEL_DETAIL_LEVELS = ['entities', 'properties', 'full', 'tables', 'keys', 'components', 'endpoints'];
+let rendererExtras = {};
+// --only-diff projects the diagram onto nodes whose sources intersect a Git
+// diff before rendering. It is a CLI concern: the renderer only ever sees the
+// projected JSON, written beside the temp specification.
+let diffOptions = { enabled: false, range: undefined, neighbors: false };
+let activeDiffProjection = null;
+
 function extractQualityArgs(args) {
   const rest = [];
   let quality;
+  rendererExtras = {};
+  diffOptions = { enabled: false, range: undefined, neighbors: false };
+  activeDiffProjection = null;
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
+    if (arg === '--only-diff' || arg.startsWith('--only-diff=')) {
+      diffOptions.enabled = true;
+      if (arg.startsWith('--only-diff=')) {
+        diffOptions.range = arg.slice('--only-diff='.length);
+        if (!diffOptions.range) fail('--only-diff= requires a Git range such as HEAD~1..HEAD or main.');
+      }
+      continue;
+    }
+    if (arg === '--diff-neighbors') {
+      diffOptions.neighbors = true;
+      continue;
+    }
+    if (arg === '--detail' || arg.startsWith('--detail=')) {
+      const detail = arg === '--detail' ? args[index + 1] : arg.slice('--detail='.length);
+      if (!detail || detail.startsWith('--')) fail(`--detail requires one of ${MODEL_DETAIL_LEVELS.join(', ')}.`);
+      if (!MODEL_DETAIL_LEVELS.includes(detail)) fail(`Unknown detail level "${detail}". Expected one of ${MODEL_DETAIL_LEVELS.join(', ')}.`);
+      rendererExtras.ARCHIFY_MODEL_DETAIL = detail;
+      if (arg === '--detail') index += 1;
+      continue;
+    }
     if (arg === '--quality') {
       quality = args[index + 1];
       if (!quality || quality.startsWith('--')) fail('--quality requires standard or showcase.');
@@ -103,10 +136,75 @@ function extractRepoRootArgs(args) {
 
 function rendererEnv(quality, repoRoot, diagnosticJson = false) {
   return {
+    ...rendererExtras,
     ...(quality ? { ARCHIFY_QUALITY_PROFILE: quality } : {}),
     ...(repoRoot ? { ARCHIFY_REPO_ROOT: repoRoot } : {}),
     ...(diagnosticJson ? { ARCHIFY_DIAGNOSTIC_FORMAT: 'json' } : {}),
   };
+}
+
+function gitTopLevel(startDirectory) {
+  const result = spawnSync('git', ['-C', startDirectory, 'rev-parse', '--show-toplevel'], { encoding: 'utf8' });
+  if (result.status !== 0) return null;
+  return result.stdout.trim();
+}
+
+function onlyDiffOutputPath(type, input, requestedOutput) {
+  if (requestedOutput) return requestedOutput;
+  let authored;
+  try { authored = JSON.parse(fs.readFileSync(input, 'utf8'))?.meta?.output; } catch { authored = undefined; }
+  const base = path.resolve(authored || `${type}.html`);
+  return base.replace(/\.html?$/i, '') + '.only-diff.html';
+}
+
+// Apply --only-diff: returns the input path the renderer should read, and
+// records the projection receipt for JSON output. Fails closed on types
+// without source evidence, on Git errors, and on an empty intersection.
+async function projectInputForOnlyDiff(type, input, repoRoot) {
+  if (!diffOptions.enabled) return input;
+  let projectionRuntime;
+  try {
+    projectionRuntime = await import('../renderers/shared/diff-projection.mjs');
+  } catch (error) {
+    fail(`--only-diff runtime is unavailable: ${error.message}`);
+  }
+  const { projectDiagramToGitDiff, diffProjectionSupported } = projectionRuntime;
+  if (!diffProjectionSupported(type)) {
+    fail(`--only-diff is supported for architecture, domain, erd, and http-call diagrams, not ${type}.`);
+  }
+  const inputPath = path.resolve(input);
+  let diagram;
+  try {
+    diagram = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
+  } catch (error) {
+    fail(`Could not read --only-diff input "${inputPath}": ${error.message}`);
+  }
+  const root = repoRoot || gitTopLevel(path.dirname(inputPath)) || gitTopLevel(process.cwd());
+  if (!root) fail('--only-diff needs a Git repository: pass --repo-root <path> or run inside the repository.');
+  let projection;
+  try {
+    projection = projectDiagramToGitDiff({ diagramType: type, diagram, repoRoot: root, range: diffOptions.range, neighbors: diffOptions.neighbors });
+  } catch (error) {
+    fail(error.message);
+  }
+  const stagingDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'archify-only-diff-'));
+  const projectedPath = path.join(stagingDirectory, path.basename(inputPath));
+  fs.writeFileSync(projectedPath, `${JSON.stringify(projection.diagram, null, 2)}${'\n'}`);
+  activeDiffProjection = {
+    source: inputPath,
+    projected: projectedPath,
+    repoRoot: root,
+    range: projection.range,
+    neighbors: diffOptions.neighbors,
+    changedFiles: projection.changedFiles,
+    kept: projection.kept,
+    removed: projection.removed,
+    matches: projection.matches,
+    relationshipsKept: projection.relationshipsKept,
+    relationshipsRemoved: projection.relationshipsRemoved,
+  };
+  console.error(`only-diff: ${projection.kept.length} of ${projection.kept.length + projection.removed.length} nodes touched by ${projection.range} (${projection.changedFiles.length} changed file(s)); removed: ${projection.removed.join(', ') || 'none'}`);
+  return projectedPath;
 }
 
 function diagnostic({ code, message, subject = {}, evidence = {}, supportedFixes = [], severity = 'error' }) {
@@ -240,8 +338,8 @@ function formatDiagnostics(error, diagnostics = []) {
 }
 
 function assertEvidenceType(type, repoRoot) {
-  if (repoRoot && type !== 'architecture') {
-    fail('--repo-root is currently supported for architecture diagrams only.');
+  if (repoRoot && !['architecture', 'domain', 'erd', 'http-call'].includes(type)) {
+    fail('--repo-root is currently supported for architecture, domain, erd, and http-call diagrams only.');
   }
 }
 
@@ -693,14 +791,16 @@ async function commandCompare(args) {
   }
 }
 
-function commandRender(args) {
+async function commandRender(args) {
   const qualityArgs = extractQualityArgs(args);
   const repoArgs = extractRepoRootArgs(qualityArgs.rest);
-  const [type, input, output] = repoArgs.rest;
-  if (!type || !input) fail(usage());
+  const [type, rawInput, rawOutput] = repoArgs.rest;
+  if (!type || !rawInput) fail(usage());
   assertEvidenceType(type, repoArgs.repoRoot);
+  const output = diffOptions.enabled ? onlyDiffOutputPath(type, rawInput, rawOutput) : rawOutput;
+  const input = await projectInputForOnlyDiff(type, rawInput, repoArgs.repoRoot || activeDiffProjection?.repoRoot);
   const result = runNode([rendererPath(type), input, ...(output ? [output] : [])], {
-    env: rendererEnv(qualityArgs.quality, repoArgs.repoRoot),
+    env: rendererEnv(qualityArgs.quality, repoArgs.repoRoot || activeDiffProjection?.repoRoot),
   });
   if (result.status !== 0) exitFrom(result);
 }
@@ -757,9 +857,12 @@ async function commandDeliver(args) {
   const unknown = repoArgs.rest.filter((arg) => arg.startsWith('--') && !knownOptions.has(arg));
   if (unknown.length) fail(`Unknown deliver option "${unknown[0]}".`);
   const positional = repoArgs.rest.filter((arg) => !knownOptions.has(arg));
-  const [type, input, requestedOutput] = positional;
-  if (!type || !input || positional.length > 3) fail(usage());
+  const [type, rawInput, rawRequestedOutput] = positional;
+  if (!type || !rawInput || positional.length > 3) fail(usage());
   assertEvidenceType(type, repoArgs.repoRoot);
+  const requestedOutput = diffOptions.enabled ? onlyDiffOutputPath(type, rawInput, rawRequestedOutput) : rawRequestedOutput;
+  const input = await projectInputForOnlyDiff(type, rawInput, repoArgs.repoRoot);
+  if (activeDiffProjection && !repoArgs.repoRoot) repoArgs.repoRoot = activeDiffProjection.repoRoot;
 
   const renderer = rendererPath(type);
   const inputPath = path.resolve(input);
@@ -1002,6 +1105,7 @@ async function commandDeliver(args) {
       type,
       input: inputPath,
       output: outputPath,
+      ...(activeDiffProjection ? { diffProjection: activeDiffProjection } : {}),
       specification: {
         sha256: createHash('sha256').update(specification).digest('hex'),
         bytes: specification.byteLength,
@@ -1121,10 +1225,13 @@ async function commandPreview(args) {
   const unknown = repoArgs.rest.filter((arg) => arg.startsWith('--') && !knownOptions.has(arg));
   if (unknown.length) fail(`Unknown preview option "${unknown[0]}".`);
   const positional = repoArgs.rest.filter((arg) => !knownOptions.has(arg));
-  const [type, input, output] = positional;
-  if (!type || !input || positional.length > 3) fail(usage());
+  const [type, rawInput, rawOutput] = positional;
+  if (!type || !rawInput || positional.length > 3) fail(usage());
   assertEvidenceType(type, repoArgs.repoRoot);
   rendererPath(type);
+  if (diffOptions.enabled) fail('--only-diff is not available for preview; use render, validate, or deliver.');
+  const input = rawInput;
+  const output = rawOutput;
 
   let runPreview;
   try {
@@ -1292,7 +1399,7 @@ async function commandDoctor() {
   if (validatorsExist) {
     try {
       const module = await import(`${pathToFileURL(validators).href}?doctor=${Date.now()}`);
-      validatorsValid = [...TYPES].every((type) => typeof module[type] === 'function');
+      validatorsValid = [...TYPES].every((type) => typeof (module[type] || module[type.replace(/-([a-z])/g, (_match, letter) => letter.toUpperCase())]) === 'function');
     } catch {
       validatorsValid = false;
     }
@@ -1311,6 +1418,9 @@ async function commandDoctor() {
     sequence: 'cache-miss-request.sequence.json',
     dataflow: 'product-analytics.dataflow.json',
     lifecycle: 'agent-run.lifecycle.json',
+    domain: 'order-management.domain.json',
+    erd: 'order-management.erd.json',
+    'http-call': 'storefront.http-call.json',
   };
 
   for (const type of TYPES) {
@@ -1807,7 +1917,7 @@ async function commandMigrate(args) {
   }
 }
 
-function commandValidate(args) {
+async function commandValidate(args) {
   const qualityArgs = extractQualityArgs(args);
   const repoArgs = extractRepoRootArgs(qualityArgs.rest);
   args = repoArgs.rest;
@@ -1819,18 +1929,19 @@ function commandValidate(args) {
   const json = args.includes('--json');
   const layoutJson = args.includes('--layout-json');
   const rest = args.filter((arg) => !knownOptions.has(arg));
-  const [type, input] = rest;
-  if (!type || !input || rest.length !== 2) fail(usage());
+  const [type, rawInput] = rest;
+  if (!type || !rawInput || rest.length !== 2) fail(usage());
   assertEvidenceType(type, repoRoot);
+  const input = await projectInputForOnlyDiff(type, rawInput, repoRoot);
   const renderer = rendererPath(type);
 
   if (layoutJson) {
-    if (!['architecture', 'workflow'].includes(type)) {
-      fail('--layout-json is currently supported for architecture and workflow diagrams only.');
+    if (!['architecture', 'workflow', 'domain', 'erd', 'http-call'].includes(type)) {
+      fail('--layout-json is currently supported for architecture, workflow, domain, erd, and http-call diagrams only.');
     }
     const result = runNode([renderer, input, '/dev/null', '--layout-json'], {
       stdio: 'pipe',
-      env: rendererEnv(quality, repoRoot, true),
+      env: rendererEnv(quality, repoRoot || activeDiffProjection?.repoRoot, true),
     });
     if (result.status !== 0) {
       try {
@@ -1867,7 +1978,7 @@ function commandValidate(args) {
   try {
     const render = runNode([renderer, input, out], {
       stdio: 'pipe',
-      env: rendererEnv(quality, repoRoot, true),
+      env: rendererEnv(quality, repoRoot || activeDiffProjection?.repoRoot, true),
     });
     if (render.status !== 0) {
       const failure = rendererFailure(render);
@@ -1912,6 +2023,7 @@ function commandValidate(args) {
             command: 'validate',
             type,
             input: path.resolve(input),
+            ...(activeDiffProjection ? { diffProjection: activeDiffProjection } : {}),
             checks: result.checks,
             composition: result.composition,
             ...(engineeringProfile ? { engineeringProfile } : {}),
@@ -1941,7 +2053,7 @@ switch (command) {
     console.log(usage());
     break;
   case 'render':
-    commandRender(args);
+    await commandRender(args);
     break;
   case 'compare':
     await commandCompare(args);
@@ -1953,7 +2065,7 @@ switch (command) {
     await commandPreview(args);
     break;
   case 'validate':
-    commandValidate(args);
+    await commandValidate(args);
     break;
   case 'migrate':
     await commandMigrate(args);
@@ -1962,7 +2074,7 @@ switch (command) {
     if (args[0] !== 'architecture') {
       fail('inspect is currently supported for architecture diagrams only.');
     }
-    commandValidate([...args, '--layout-json']);
+    await commandValidate([...args, '--layout-json']);
     break;
   case 'check':
     commandCheck(args);

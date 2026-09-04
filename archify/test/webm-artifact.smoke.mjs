@@ -456,7 +456,7 @@ try {
       var guidedActivated = Archify.guidedViews.activate('main', { updateUrl: false });
       var guidedActive = Archify.guidedViews.active();
       var visualMatrix = [];
-      for (var preset of ['classic', 'signal-flow', 'blueprint', 'editorial']) {
+      for (var preset of ['classic', 'signal-flow', 'blueprint', 'editorial', '4crux']) {
         if (!Archify.preset.apply(preset)) throw new Error('could not apply preset ' + preset);
         for (var theme of ['dark', 'light']) {
           document.documentElement.setAttribute('data-theme', theme);
@@ -1451,7 +1451,7 @@ try {
       }
       var identity = JSON.stringify(Archify.routeProbe.exportSnapshot());
       var results = [];
-      for (var preset of ['classic', 'signal-flow', 'blueprint', 'editorial']) {
+      for (var preset of ['classic', 'signal-flow', 'blueprint', 'editorial', '4crux']) {
         if (!Archify.preset.apply(preset)) throw new Error('could not apply preset ' + preset);
         for (var theme of ['dark', 'light']) {
           document.documentElement.setAttribute('data-theme', theme);
@@ -1602,7 +1602,7 @@ try {
           var matrix = [];
           if (${JSON.stringify(options.matrix === true)}) {
             var identity = JSON.stringify(snapshot);
-            for (var preset of ['classic', 'signal-flow', 'blueprint', 'editorial']) {
+            for (var preset of ['classic', 'signal-flow', 'blueprint', 'editorial', '4crux']) {
               if (!Archify.preset.apply(preset)) throw new Error('could not apply preset ' + preset);
               for (var theme of ['dark', 'light']) {
                 document.documentElement.setAttribute('data-theme', theme);

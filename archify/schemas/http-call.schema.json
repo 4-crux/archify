@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tt-a1i/archify/schemas/http-call.schema.json",
+  "title": "Archify HTTP Call Diagram",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "diagram_type", "meta", "components", "calls"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "diagram_type": { "const": "http-call" },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "locale": { "$ref": "common.schema.json#/$defs/locale" },
+        "subtitle": { "type": "string" },
+        "output": { "type": "string" },
+        "animation": { "$ref": "common.schema.json#/$defs/animation" },
+        "visual_preset": { "$ref": "common.schema.json#/$defs/visualPreset" },
+        "logo": { "$ref": "common.schema.json#/$defs/diagramLogo" },
+        "quality_profile": { "$ref": "common.schema.json#/$defs/qualityProfile" },
+        "detail": { "enum": ["components", "endpoints", "full"] },
+        "repository": { "$ref": "common.schema.json#/$defs/repository" },
+        "viewBox": {
+          "type": "array",
+          "prefixItems": [{ "type": "number", "minimum": 420 }, { "type": "number", "minimum": 566 }],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "views": { "$ref": "common.schema.json#/$defs/guidedViews" },
+        "legend": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "$ref": "common.schema.json#/$defs/legendMode" },
+            "entries": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "frontend": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "gateway": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "service": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "worker": { "$ref": "common.schema.json#/$defs/legendEntry" },
+                "external": { "$ref": "common.schema.json#/$defs/legendEntry" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "layout": { "$ref": "common.schema.json#/$defs/modelLayout" },
+    "zones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "wraps"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 60 },
+          "kind": { "enum": ["client", "platform", "partner", "network"] },
+          "wraps": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "common.schema.json#/$defs/id" }
+          },
+          "pad": { "type": "number", "minimum": 8, "maximum": 80 }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id" },
+          "kind": { "enum": ["frontend", "gateway", "service", "worker", "external"] },
+          "label": { "type": "string", "minLength": 1, "maxLength": 48 },
+          "base_url": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "note": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "row": { "type": "integer", "minimum": 0 },
+          "col": { "type": "integer", "minimum": 0 },
+          "pos": { "$ref": "common.schema.json#/$defs/point" },
+          "width": { "type": "number", "minimum": 100, "maximum": 400 },
+          "sources": { "$ref": "common.schema.json#/$defs/sources" }
+        }
+      }
+    },
+    "calls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "method", "path"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id" },
+          "from": { "$ref": "common.schema.json#/$defs/id" },
+          "to": { "$ref": "common.schema.json#/$defs/id" },
+          "method": { "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] },
+          "path": { "type": "string", "minLength": 1, "maxLength": 80, "pattern": "^/" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "auth": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "async": { "type": "boolean" },
+          "request": { "$ref": "#/$defs/payload" },
+          "response": { "$ref": "#/$defs/payload" },
+          "fromSide": { "$ref": "common.schema.json#/$defs/modelSide" },
+          "toSide": { "$ref": "common.schema.json#/$defs/modelSide" },
+          "route": { "enum": ["auto", "straight", "orthogonal-h", "orthogonal-v"] },
+          "via": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 6,
+            "items": { "$ref": "common.schema.json#/$defs/point" }
+          },
+          "labelAt": { "$ref": "common.schema.json#/$defs/point" },
+          "labelSegment": { "type": "integer", "minimum": 0 },
+          "labelDx": { "type": "number" },
+          "labelDy": { "type": "number" }
+        }
+      }
+    },
+    "cards": { "$ref": "common.schema.json#/$defs/cards" }
+  },
+  "$defs": {
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+        "content_type": { "type": "string", "minLength": 1, "maxLength": 48 },
+        "schema": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "body": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "fields": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "type": "string", "minLength": 1, "maxLength": 48 }
+        }
+      }
+    }
+  }
+}

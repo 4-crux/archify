@@ -14,6 +14,12 @@ Read this only when the user asks for a reader-facing capability. Ordinary gener
 - Direct Relationship Pin makes a unique compiled relationship operable while preserving the authored line and stable relationship identity. It must fail closed on conflicting source/target/label/ID metadata.
 - Route Probe resolves exactly two endpoints over authored directed relationships. It never infers a route from geometry.
 
+## Change Notes (4Crux fork)
+
+Notes mode (`A`, or the NOTES dock button) turns the next click on a node, structural frame (lane, stage, segment, boundary), or relationship into a change request. The reader writes what should change in a small editor; saved notes draw as numbered overlay markers and list in the Change Notes panel. **Copy changes** (panel button or Export → Copy change notes) writes one Markdown report to the clipboard: diagram title and type, then per note the element's stable id, label, kind, authored detail/context, incoming and outgoing relationships, the frame's contained nodes, and the request text, followed by a JSON block for tooling. It is meant to be pasted into an AI assistant that edits the Archify JSON source.
+
+Notes are viewer state only. They persist in this browser's `localStorage` under `archify-change-notes:<digest>`, where the digest covers the diagram type, title, node ids, and relationship keys, so a re-authored topology starts clean. Markers carry `data-annotation-overlay` and are removed from every canonical export; the receipt gate rejects any leftover marker. Notes never rewrite the source, the URL, or another artifact.
+
 ## Guided views and story
 
 `meta.views` may define at most five curated chapters using stable node IDs. The Named Chapter Rail, Chapter Delta Preview, Story Beat Navigator, Story Follow Camera, Story Director Strip, Story Horizon, and Shareable Story Moment links all derive from that one authored array; none owns parallel topology or layout.
@@ -42,4 +48,4 @@ After a non-empty authored reachability query, the reader may use **Export → R
 
 ## Truth boundary
 
-Viewer exports are communication assets. They do not replace the checked HTML, the deterministic delivery receipt, or a real visual review. Do not add a hosted service, storage surface, dependency, schema branch, or mobile product surface for these viewer-only capabilities.
+Viewer exports are communication assets. They do not replace the checked HTML, the deterministic delivery receipt, or a real visual review. Do not add a hosted service, dependency, schema branch, or mobile product surface for these viewer-only capabilities. The only storage surface is the browser-local Change Notes store described above; it is a reader convenience, never a second source of truth.

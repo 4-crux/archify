@@ -47,7 +47,7 @@ export async function loadDiagramWithBrandMarks(options) {
   return loaded;
 }
 
-const START_TYPES = new Set(['architecture', 'workflow', 'sequence', 'dataflow', 'lifecycle']);
+const START_TYPES = new Set(['architecture', 'workflow', 'sequence', 'dataflow', 'lifecycle', 'domain', 'erd', 'http-call']);
 
 // Common CLI tail: fill the template and write the standalone HTML file.
 export function writeDiagram({ outPath, template, diagramType, meta, svg, cards, sourceEvidence = null }) {
@@ -57,6 +57,7 @@ export function writeDiagram({ outPath, template, diagramType, meta, svg, cards,
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, applyTemplate(template, {
     title: meta.title,
+    diagramType,
     subtitle: meta.subtitle,
     svg,
     cards: renderCards(cards),
@@ -75,6 +76,9 @@ const SEMANTIC_COLLECTIONS = {
   sequence: 'participants',
   dataflow: 'nodes',
   lifecycle: 'states',
+  domain: 'entities',
+  erd: 'tables',
+  'http-call': 'components',
 };
 
 const RELATIONSHIP_COLLECTIONS = {
@@ -83,6 +87,9 @@ const RELATIONSHIP_COLLECTIONS = {
   sequence: 'messages',
   dataflow: 'flows',
   lifecycle: 'transitions',
+  domain: 'relationships',
+  erd: 'relationships',
+  'http-call': 'calls',
 };
 
 // Relationship IDs are optional for backwards compatibility, but once an

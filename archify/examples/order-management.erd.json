@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "diagram_type": "erd",
+  "meta": {
+    "title": "Order Management Schema",
+    "output": "examples/erd-order-management.html",
+    "quality_profile": "showcase",
+    "detail": "full",
+    "views": [
+      {
+        "id": "ordering",
+        "label": "Ordering tables",
+        "focus": [
+          "customers",
+          "orders",
+          "order_items",
+          "products"
+        ],
+        "note": "An order belongs to one customer and holds many items, each pointing at one product."
+      },
+      {
+        "id": "fulfilment",
+        "label": "Fulfilment tables",
+        "focus": [
+          "orders",
+          "shipments",
+          "carriers"
+        ],
+        "note": "Each shipment serves exactly one order and rides with one carrier."
+      }
+    ]
+  },
+  "layout": {
+    "mode": "grid",
+    "cols": 6,
+    "gapX": 56,
+    "gapY": 56
+  },
+  "groups": [
+    {
+      "id": "sales",
+      "label": "sales schema",
+      "kind": "schema",
+      "wraps": [
+        "customers",
+        "orders",
+        "order_items",
+        "products",
+        "product_tags",
+        "tags"
+      ]
+    },
+    {
+      "id": "logistics",
+      "label": "logistics schema",
+      "kind": "schema",
+      "wraps": [
+        "shipments",
+        "carriers"
+      ]
+    }
+  ],
+  "tables": [
+    {
+      "id": "customers",
+      "label": "customers",
+      "row": 0,
+      "col": 0,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "unique": true
+        },
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz"
+        }
+      ]
+    },
+    {
+      "id": "orders",
+      "label": "orders",
+      "row": 0,
+      "col": 1,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true
+        },
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "fk": true,
+          "ref": "customers.id"
+        },
+        {
+          "name": "status",
+          "type": "order_status"
+        },
+        {
+          "name": "total_cents",
+          "type": "bigint"
+        },
+        {
+          "name": "placed_at",
+          "type": "timestamptz",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "id": "order_items",
+      "label": "order_items",
+      "row": 0,
+      "col": 2,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true
+        },
+        {
+          "name": "order_id",
+          "type": "uuid",
+          "fk": true,
+          "ref": "orders.id"
+        },
+        {
+          "name": "product_id",
+          "type": "uuid",
+          "fk": true,
+          "ref": "products.id"
+        },
+        {
+          "name": "quantity",
+          "type": "int"
+        },
+        {
+          "name": "unit_cents",
+          "type": "bigint"
+        }
+      ]
+    },
+    {
+      "id": "products",
+      "label": "products",
+      "row": 0,
+      "col": 3,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true
+        },
+        {
+          "name": "sku",
+          "type": "text",
+          "unique": true
+        },
+        {
+          "name": "title",
+          "type": "text"
+        },
+        {
+          "name": "active",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "id": "product_tags",
+      "kind": "junction",
+      "label": "product_tags",
+      "row": 0,
+      "col": 4,
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "uuid",
+          "pk": true,
+          "fk": true,
+          "ref": "products.id"
+        },
+        {
+          "name": "tag_id",
+          "type": "uuid",
+          "pk": true,
+          "fk": true,
+          "ref": "tags.id"
+        }
+      ]
+    },
+    {
+      "id": "tags",
+      "label": "tags",
+      "row": 0,
+      "col": 5,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true
+        },
+        {
+          "name": "slug",
+          "type": "text",
+          "unique": true
+        }
+      ]
+    },
+    {
+      "id": "shipments",
+      "label": "shipments",
+      "row": 1,
+      "col": 1,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true
+        },
+        {
+          "name": "order_id",
+          "type": "uuid",
+          "fk": true,
+          "ref": "orders.id"
+        },
+        {
+          "name": "carrier_id",
+          "type": "uuid",
+          "fk": true,
+          "ref": "carriers.id"
+        },
+        {
+          "name": "tracking",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "shipped_at",
+          "type": "timestamptz",
+          "nullable": true
+        }
+      ]
+    },
+    {
+      "id": "carriers",
+      "label": "carriers",
+      "row": 1,
+      "col": 2,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true
+        },
+        {
+          "name": "code",
+          "type": "text",
+          "unique": true
+        },
+        {
+          "name": "name",
+          "type": "text"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": "customer-orders",
+      "from": "customers",
+      "to": "orders",
+      "kind": "one-to-many",
+      "label": "places"
+    },
+    {
+      "id": "order-items",
+      "from": "orders",
+      "to": "order_items",
+      "kind": "one-to-many",
+      "label": "contains"
+    },
+    {
+      "id": "product-items",
+      "from": "products",
+      "to": "order_items",
+      "kind": "one-to-many"
+    },
+    {
+      "id": "product-tags",
+      "from": "products",
+      "to": "product_tags",
+      "kind": "one-to-many"
+    },
+    {
+      "id": "tag-products",
+      "from": "tags",
+      "to": "product_tags",
+      "kind": "one-to-many"
+    },
+    {
+      "id": "order-shipments",
+      "from": "orders",
+      "to": "shipments",
+      "kind": "one-to-many",
+      "label": "fulfilled by",
+      "to_optional": true
+    },
+    {
+      "id": "carrier-shipments",
+      "from": "carriers",
+      "to": "shipments",
+      "kind": "one-to-many"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Keys",
+      "dot": "emerald",
+      "items": [
+        "Every table uses uuid primary keys",
+        "product_tags is a composite-key junction"
+      ]
+    },
+    {
+      "title": "Constraints",
+      "dot": "amber",
+      "items": [
+        "customers.email and products.sku are unique",
+        "shipments.tracking stays null until dispatch"
+      ]
+    },
+    {
+      "title": "Schemas",
+      "dot": "violet",
+      "items": [
+        "sales owns ordering data",
+        "logistics only references orders.id"
+      ]
+    }
+  ]
+}

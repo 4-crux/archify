@@ -36,7 +36,7 @@ function formatErrors(errors, data) {
 }
 
 export function validateSchema(diagramType, data) {
-  const validate = validators[diagramType];
+  const validate = validators[diagramType] || validators[diagramType.replace(/-([a-z])/g, (_match, letter) => letter.toUpperCase())];
   if (!validate) {
     throw new Error(`validateSchema: unknown diagram type "${diagramType}"`);
   }

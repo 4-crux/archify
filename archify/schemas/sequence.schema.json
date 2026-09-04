@@ -44,6 +44,7 @@
         "visual_preset": {
           "$ref": "common.schema.json#/$defs/visualPreset"
         },
+        "logo": { "$ref": "common.schema.json#/$defs/diagramLogo" },
         "quality_profile": {
           "$ref": "common.schema.json#/$defs/qualityProfile"
         },

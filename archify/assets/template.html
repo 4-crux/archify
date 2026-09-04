@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="archify 2.17.0-dev.1">
   <title>[PROJECT NAME] Architecture Diagram</title>
+  <meta name="archify-diagram-type" content="[DIAGRAM TYPE]">
   <script>
     // Resolve the theme before first paint so light-preference users don't
     // see a dark flash. The toolbar script below re-applies with UI state.
@@ -85,6 +86,12 @@
       --toolbar-text:     #e2e8f0;
       --toolbar-hover:    rgba(15, 23, 42, 0.95);
       --toolbar-menu-bg:  #0f172a;
+
+      /* Diagram logo plate (meta.logo). Brand colors stay fixed across
+         presets; only the plate/ink pair adapts to the color mode. */
+      --logo-plate: #778da9;
+      --logo-ink:   #0d1b2a;
+      --logo-word:  var(--text);
     }
 
     [data-theme="light"] {
@@ -125,6 +132,10 @@
       --toolbar-text:     #334155;
       --toolbar-hover:    #ffffff;
       --toolbar-menu-bg:  #ffffff;
+
+      --logo-plate: #415a77;
+      --logo-ink:   #e0e1dd;
+      --logo-word:  var(--text);
     }
 
     /* ==========================================================
@@ -348,6 +359,86 @@
       --toolbar-menu-bg: #fbf8f1;
     }
 
+    /* ==========================================================
+       4CRUX — company identity preset. Base tones come from the
+       4Crux palette (#0D1B2A · #1B263B · #415A77 · #778DA9 · #E0E1DD);
+       the seven semantic kinds keep distinct, higher-contrast accents
+       so nodes and emphasis edges still read at a glance.
+       ========================================================== */
+    [data-preset="4crux"][data-theme="dark"] {
+      --bg: #0d1b2a;
+      --grid: #1b263b;
+      --panel: rgba(27, 38, 59, 0.72);
+      --panel-border: #415a77;
+      --lane-fill: rgba(65, 90, 119, 0.18);
+      --lane-stroke: #415a77;
+      --text: #e0e1dd;
+      --text-muted: #778da9;
+      --text-dim: #5b6f8c;
+      --text-faint: #8fa3bd;
+      --mask: #172336;
+      --frontend-fill: rgba(93, 211, 243, 0.14);
+      --frontend-stroke: #5dd3f3;
+      --backend-fill: rgba(95, 212, 166, 0.14);
+      --backend-stroke: #5fd4a6;
+      --database-fill: rgba(179, 157, 219, 0.15);
+      --database-stroke: #b39ddb;
+      --cloud-fill: rgba(233, 196, 106, 0.14);
+      --cloud-stroke: #e9c46a;
+      --security-fill: rgba(242, 126, 126, 0.14);
+      --security-stroke: #f27e7e;
+      --messagebus-fill: rgba(244, 162, 97, 0.14);
+      --messagebus-stroke: #f4a261;
+      --external-fill: rgba(119, 141, 169, 0.18);
+      --external-stroke: #b8c2cf;
+      --arrow: #778da9;
+      --arrow-emphasis: #e9c46a;
+      --toolbar-bg: rgba(27, 38, 59, 0.92);
+      --toolbar-border: #415a77;
+      --toolbar-text: #e0e1dd;
+      --toolbar-hover: rgba(65, 90, 119, 0.55);
+      --toolbar-menu-bg: #1b263b;
+      --logo-plate: #778da9;
+      --logo-ink: #0d1b2a;
+    }
+
+    [data-preset="4crux"][data-theme="light"] {
+      --bg: #e0e1dd;
+      --grid: #cdd1cc;
+      --panel: #f5f6f3;
+      --panel-border: #b9c3d1;
+      --lane-fill: rgba(119, 141, 169, 0.12);
+      --lane-stroke: #9fb0c7;
+      --text: #0d1b2a;
+      --text-muted: #415a77;
+      --text-dim: #778da9;
+      --text-faint: #5f7591;
+      --mask: #f5f6f3;
+      --frontend-fill: rgba(14, 124, 155, 0.11);
+      --frontend-stroke: #0e7c9b;
+      --backend-fill: rgba(30, 138, 94, 0.11);
+      --backend-stroke: #1e8a5e;
+      --database-fill: rgba(107, 79, 163, 0.11);
+      --database-stroke: #6b4fa3;
+      --cloud-fill: rgba(185, 119, 14, 0.12);
+      --cloud-stroke: #b9770e;
+      --security-fill: rgba(192, 57, 43, 0.1);
+      --security-stroke: #c0392b;
+      --messagebus-fill: rgba(208, 101, 28, 0.11);
+      --messagebus-stroke: #d0651c;
+      --external-fill: rgba(65, 90, 119, 0.12);
+      --external-stroke: #415a77;
+      --arrow: #778da9;
+      --arrow-emphasis: #b9770e;
+      --toolbar-bg: rgba(245, 246, 243, 0.94);
+      --toolbar-border: #b9c3d1;
+      --toolbar-text: #1b263b;
+      --toolbar-hover: #ffffff;
+      --toolbar-menu-bg: #f5f6f3;
+      --logo-plate: #415a77;
+      --logo-ink: #e0e1dd;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
@@ -402,6 +493,7 @@
     html[data-embed="true"] .focus-chip,
     html[data-embed="true"] .route-probe,
     html[data-embed="true"] .semantic-lens,
+    html[data-embed="true"] .change-notes,
     html[data-embed="true"] .diagram-guide,
     html[data-embed="true"] .node-finder,
     html[data-embed="true"] .guided-views { display: none !important; }
@@ -721,6 +813,33 @@
       font-style: italic;
       font-weight: 600;
       letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    html[data-preset="4crux"] h1 {
+      font-family: 'M PLUS U', 'Instrument Sans', 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      letter-spacing: -0.01em;
+    }
+    html[data-preset="4crux"] .pulse-dot {
+      width: 11px;
+      height: 11px;
+      border: none;
+      border-radius: 3px;
+      background: var(--logo-plate);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--logo-plate) 22%, transparent);
+      animation: none;
+    }
+    html[data-preset="4crux"] .header-row::after {
+      content: attr(data-preset-badge-4crux);
+      margin-left: auto;
+      padding: 0.3rem 0.62rem;
+      border-radius: 0.4rem;
+      background: var(--logo-plate);
+      color: var(--logo-ink);
+      font-family: 'M PLUS U', 'Instrument Sans', 'Inter', 'Segoe UI', Arial, sans-serif;
+      font-size: 0.625rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
       white-space: nowrap;
     }
 
@@ -1404,6 +1523,16 @@
     .semantic-lens-kind[data-kind="security"],
     .semantic-lens-kind[data-kind="decision"],
     .semantic-lens-kind[data-kind="failure"] { --lens-color: var(--security-stroke); }
+    .semantic-lens-kind[data-kind="aggregate-root"],
+    .semantic-lens-kind[data-kind="table"],
+    .semantic-lens-kind[data-kind="service"] { --lens-color: var(--backend-stroke); }
+    .semantic-lens-kind[data-kind="entity"] { --lens-color: var(--frontend-stroke); }
+    .semantic-lens-kind[data-kind="value-object"] { --lens-color: var(--database-stroke); }
+    .semantic-lens-kind[data-kind="enum"],
+    .semantic-lens-kind[data-kind="view"],
+    .semantic-lens-kind[data-kind="gateway"] { --lens-color: var(--cloud-stroke); }
+    .semantic-lens-kind[data-kind="domain-event"],
+    .semantic-lens-kind[data-kind="worker"] { --lens-color: var(--messagebus-stroke); }
     .semantic-lens-kind:hover,
     .semantic-lens-kind:focus-visible,
     .semantic-lens-kind[aria-pressed="true"] {
@@ -1470,6 +1599,333 @@
       from { opacity: 0; transform: translateY(5px) scale(0.985); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
+
+
+    /* Change Notes let a reader attach change requests to nodes, structural
+       frames, and relationships, then copy one structured report for an AI
+       assistant or a teammate. The panel is viewer chrome; the markers are
+       an overlay that every canonical export strips. */
+    .change-notes {
+      position: absolute;
+      right: 1rem;
+      bottom: calc(4.15rem + var(--archify-nav-reserve));
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+      width: min(22rem, calc(100% - 2rem));
+      max-height: calc(100% - 5.5rem);
+      overflow: hidden;
+      border: 1px solid color-mix(in srgb, var(--arrow-emphasis) 58%, var(--toolbar-border));
+      border-radius: 0.82rem;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--arrow-emphasis) 12%, transparent), transparent 48%),
+        var(--toolbar-menu-bg);
+      color: var(--toolbar-text);
+      box-shadow: 0 18px 52px rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(18px);
+      animation: archify-lens-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .change-notes[hidden] { display: none; }
+    .change-notes[data-dock="top-left"],
+    .change-notes[data-dock="top-right"] { top: 1rem; bottom: auto; }
+    .change-notes[data-dock="top-left"],
+    .change-notes[data-dock="bottom-left"] { right: auto; left: 1rem; }
+    .change-notes[data-dock="outside-left"],
+    .change-notes[data-dock="outside-right"] {
+      position: fixed;
+      right: auto;
+      bottom: auto;
+      max-height: calc(100vh - 2rem);
+    }
+    html[data-preset="blueprint"] .change-notes { border-radius: 0.28rem; }
+    .change-notes-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 0.75rem;
+      padding: 0.72rem 0.78rem 0.62rem;
+      border-bottom: 1px solid var(--toolbar-border);
+    }
+    .change-notes-eyebrow {
+      display: block;
+      color: var(--arrow-emphasis);
+      font-size: 0.5rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .change-notes-title {
+      display: block;
+      margin-top: 0.16rem;
+      color: var(--text);
+      font-size: 0.82rem;
+      letter-spacing: -0.02em;
+    }
+    .change-notes-close {
+      width: 1.75rem;
+      height: 1.75rem;
+      padding: 0;
+      border: 0;
+      border-radius: 0.35rem;
+      background: transparent;
+      color: var(--toolbar-text);
+      font: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .change-notes-close:hover,
+    .change-notes-close:focus-visible { background: var(--toolbar-hover); }
+    .change-notes-instruction {
+      margin: 0;
+      padding: 0.52rem 0.78rem 0.48rem;
+      color: var(--text-faint);
+      font-size: 0.55rem;
+      line-height: 1.45;
+    }
+    .change-notes-editor {
+      padding: 0.5rem 0.78rem 0.6rem;
+      border-top: 1px solid var(--toolbar-border);
+      border-bottom: 1px solid var(--toolbar-border);
+      background: color-mix(in srgb, var(--arrow-emphasis) 6%, transparent);
+    }
+    .change-notes-editor[hidden] { display: none; }
+    .change-notes-target {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.15rem 0.45rem;
+      margin-bottom: 0.42rem;
+    }
+    .change-notes-target-kind {
+      color: var(--arrow-emphasis);
+      font-size: 0.5rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .change-notes-target-label {
+      overflow: hidden;
+      color: var(--text);
+      font-size: 0.7rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .change-notes-target-id {
+      grid-column: 2;
+      color: var(--text-faint);
+      font-size: 0.52rem;
+    }
+    .change-notes-label {
+      display: block;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .change-notes textarea {
+      display: block;
+      width: 100%;
+      min-height: 4.6rem;
+      padding: 0.45rem 0.5rem;
+      border: 1px solid var(--toolbar-border);
+      border-radius: 0.45rem;
+      background: color-mix(in srgb, var(--panel) 76%, transparent);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.62rem;
+      line-height: 1.45;
+      resize: vertical;
+    }
+    .change-notes textarea:focus-visible {
+      outline: 2px solid var(--arrow-emphasis);
+      outline-offset: 1px;
+    }
+    .change-notes-editor-actions,
+    .change-notes-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.28rem;
+    }
+    .change-notes-editor-actions { margin-top: 0.42rem; }
+    .change-notes-actions { padding: 0 0.62rem 0.62rem; }
+    .change-notes-editor-actions button,
+    .change-notes-actions button {
+      min-height: 1.8rem;
+      padding: 0.28rem 0.52rem;
+      border: 1px solid transparent;
+      border-radius: 0.35rem;
+      background: transparent;
+      color: var(--toolbar-text);
+      font: inherit;
+      font-size: 0.56rem;
+      cursor: pointer;
+    }
+    .change-notes-editor-actions button:hover,
+    .change-notes-actions button:hover { background: var(--toolbar-hover); }
+    .change-notes-editor-actions button:focus-visible,
+    .change-notes-actions button:focus-visible,
+    .change-notes-item:focus-visible {
+      outline: 2px solid var(--arrow-emphasis);
+      outline-offset: 1px;
+    }
+    .change-notes-editor-actions button:disabled,
+    .change-notes-actions button:disabled { opacity: 0.4; cursor: default; }
+    .change-notes-editor-actions button[hidden] { display: none; }
+    #change-notes-save,
+    #change-notes-copy {
+      border-color: color-mix(in srgb, var(--arrow-emphasis) 70%, transparent);
+      background: var(--arrow-emphasis);
+      color: var(--bg);
+      font-weight: 800;
+    }
+    #change-notes-save:hover,
+    #change-notes-copy:hover:not(:disabled) { background: color-mix(in srgb, var(--arrow-emphasis) 84%, var(--text)); }
+    #change-notes-delete { color: var(--security-stroke); }
+    .change-notes-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: min(14rem, 36vh);
+      margin: 0;
+      padding: 0.3rem 0.5rem;
+      overflow-y: auto;
+      list-style: none;
+      scrollbar-width: thin;
+    }
+    .change-notes-empty {
+      padding: 0.45rem 0.3rem;
+      color: var(--text-faint);
+      font-size: 0.55rem;
+      line-height: 1.45;
+    }
+    .change-notes-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: start;
+      gap: 0.45rem;
+      width: 100%;
+      margin-bottom: 0.25rem;
+      padding: 0.35rem 0.42rem;
+      border: 1px solid var(--toolbar-border);
+      border-radius: 0.45rem;
+      background: color-mix(in srgb, var(--panel) 76%, transparent);
+      color: var(--toolbar-text);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 140ms ease, background 140ms ease;
+    }
+    html[data-preset="blueprint"] .change-notes-item { border-radius: 0.12rem; }
+    .change-notes-item:hover,
+    .change-notes-item:focus-visible,
+    .change-notes-item[aria-current="true"] {
+      border-color: color-mix(in srgb, var(--arrow-emphasis) 78%, var(--toolbar-border));
+      background: color-mix(in srgb, var(--arrow-emphasis) 10%, var(--panel));
+    }
+    .change-notes-item[data-missing="true"] { opacity: 0.62; }
+    .change-notes-item-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.05rem;
+      height: 1.05rem;
+      margin-top: 0.05rem;
+      border-radius: 999px;
+      background: var(--arrow-emphasis);
+      color: var(--bg);
+      font-size: 0.52rem;
+      font-weight: 800;
+    }
+    .change-notes-item-copy { min-width: 0; }
+    .change-notes-item-copy strong,
+    .change-notes-item-copy em,
+    .change-notes-item-copy small { display: block; }
+    .change-notes-item-copy strong {
+      overflow: hidden;
+      color: var(--text);
+      font-size: 0.62rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .change-notes-item-copy em {
+      color: var(--arrow-emphasis);
+      font-size: 0.5rem;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .change-notes-item-copy small {
+      display: -webkit-box;
+      overflow: hidden;
+      margin-top: 0.15rem;
+      color: var(--text-muted);
+      font-size: 0.55rem;
+      line-height: 1.4;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+    .change-notes-status {
+      min-height: 2.2rem;
+      margin: 0;
+      padding: 0.5rem 0.78rem;
+      border-top: 1px solid var(--toolbar-border);
+      color: var(--text-faint);
+      font-size: 0.55rem;
+      line-height: 1.45;
+    }
+    html[data-change-notes-mode="on"] .diagram-container {
+      box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--arrow-emphasis) 55%, transparent);
+    }
+    html[data-change-notes-mode="on"] .diagram-container svg [data-node-id],
+    html[data-change-notes-mode="on"] .diagram-container svg [data-composition-frame-id],
+    html[data-change-notes-mode="on"] .diagram-container svg [data-relationship-hit-key] { cursor: crosshair; }
+    .diagram-nav #btn-change-notes {
+      position: relative;
+      min-width: auto;
+      padding-inline: 0.5rem;
+      color: color-mix(in srgb, var(--toolbar-text) 86%, transparent);
+      font-weight: 650;
+    }
+    .diagram-nav #btn-change-notes[aria-pressed="true"] {
+      background: color-mix(in srgb, var(--arrow-emphasis) 18%, transparent);
+      color: var(--arrow-emphasis);
+    }
+    .change-notes-count {
+      position: absolute;
+      top: -0.3rem;
+      right: -0.25rem;
+      min-width: 1rem;
+      height: 1rem;
+      padding: 0 0.25rem;
+      border-radius: 999px;
+      background: var(--arrow-emphasis);
+      color: var(--bg);
+      font-size: 0.5rem;
+      font-weight: 800;
+      line-height: 1rem;
+      text-align: center;
+    }
+    .change-notes-count[hidden] { display: none; }
+    svg .change-notes-overlay { pointer-events: none; }
+    svg .change-note-outline {
+      fill: color-mix(in srgb, var(--arrow-emphasis) 8%, transparent);
+      stroke: var(--arrow-emphasis);
+      stroke-width: 1.2;
+      stroke-dasharray: 4 3;
+      vector-effect: non-scaling-stroke;
+    }
+    svg .change-note-marker[data-annotation-editing="true"] .change-note-outline {
+      stroke-width: 2;
+      stroke-dasharray: none;
+    }
+    svg .change-note-badge {
+      fill: var(--arrow-emphasis);
+      stroke: var(--bg);
+      stroke-width: 1.5;
+    }
+    svg .change-note-number { fill: var(--bg); }
 
     /* Route Probe answers a reader question over the compiled semantic graph:
        choose two stable nodes and reveal the shortest authored directed route.
@@ -3178,6 +3634,12 @@
       box-shadow: 0 0 0 2px color-mix(in srgb, var(--arrow-emphasis) 14%, transparent);
       transform: rotate(45deg) scale(0.72);
     }
+    #btn-preset[data-preset-option="4crux"] .preset-control-mark {
+      border-color: var(--logo-plate);
+      border-radius: 0.22rem;
+      background: var(--logo-plate);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--logo-plate) 22%, transparent);
+    }
     .toolbar .preset-menu {
       position: absolute;
       top: calc(100% + 0.375rem);
@@ -3316,6 +3778,26 @@
       height: 0.38rem;
       background: #c9502d;
       transform: rotate(45deg);
+    }
+    .preset-option-swatch.fourcrux {
+      border-color: #415a77;
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+    }
+    .preset-option-swatch.fourcrux::before {
+      top: 0.3rem;
+      left: 0.3rem;
+      width: 0.62rem;
+      height: 0.62rem;
+      border-radius: 0.18rem;
+      background: #778da9;
+    }
+    .preset-option-swatch.fourcrux::after {
+      top: 0.52rem;
+      right: 0.28rem;
+      width: 0.42rem;
+      height: 2px;
+      border-radius: 1px;
+      background: #e9c46a;
     }
     .preset-option-copy { min-width: 0; }
     .preset-option-copy strong,
@@ -3677,6 +4159,13 @@
       }
       .semantic-lens[data-dock-side] { left: auto; right: 0.5rem; }
       .semantic-lens-kinds { max-height: min(12rem, 34vh); }
+      .change-notes {
+        right: 0.5rem;
+        bottom: 3.7rem;
+        width: calc(100% - 1rem);
+        max-height: calc(100% - 4.2rem);
+      }
+      .change-notes-list { max-height: min(10rem, 30vh); }
       .focus-chip {
         left: 0.5rem;
         top: 0.5rem;
@@ -4001,6 +4490,16 @@
     svg[data-preset="blueprint"] .brand-mark-badge,
     svg[data-preset="blueprint"] .brand-mark-frame { rx: 1px; }
 
+    /* Diagram logo is authored through meta.logo and rendered as real SVG so
+       it survives every canonical export. It reads brand colors from the
+       --logo-* variables, which follow the color mode but never the semantic
+       node palette. */
+    svg .diagram-logo { pointer-events: none; }
+    svg .diagram-logo-plate { fill: var(--logo-plate); stroke: none; }
+    svg .diagram-logo-glyph { fill: var(--logo-ink); }
+    svg .diagram-logo-word { fill: var(--logo-word, var(--text)); }
+    svg[data-preset="blueprint"] .diagram-logo-plate { rx: 1px; }
+
     /* Reading Depth is a viewer-only level-of-detail layer. MAP preserves the
        authored structure and primary labels, READ restores relationship labels
        and node context, and FULL restores tags and fine annotations. Semantic
@@ -4062,6 +4561,12 @@
 
     /* Arrowhead markers reference these */
     .m-default   { fill: var(--arrow); }
+    /* Model diagrams (domain, erd): UML and crow's-foot end notation. Line
+       markers stay unfilled; hollow markers wear the mask color so the route
+       never shows through a diamond or triangle. */
+    .m-line      { fill: none; stroke: var(--arrow); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+    .m-hollow    { fill: var(--mask); stroke: var(--arrow); stroke-width: 1.2; stroke-linejoin: round; }
+    .a-model-dashed { stroke: var(--arrow); fill: none; stroke-dasharray: 4,3; }
     .m-emphasis  { fill: var(--arrow-emphasis); }
     .m-security  { fill: var(--security-stroke); }
     .m-dashed    { fill: var(--database-stroke); }
@@ -4894,6 +5399,11 @@
           <span class="preset-option-copy"><strong>{{i18n:viewer.preset.editorial}}</strong><small>{{i18n:viewer.preset.editorial.hint}}</small></span>
           <span class="preset-option-check" aria-hidden="true"></span>
         </button>
+        <button class="preset-option" data-preset-value="4crux" type="button" role="menuitemradio" aria-checked="false" tabindex="-1">
+          <span class="preset-option-swatch fourcrux" aria-hidden="true"></span>
+          <span class="preset-option-copy"><strong>{{i18n:viewer.preset.4crux}}</strong><small>{{i18n:viewer.preset.4crux.hint}}</small></span>
+          <span class="preset-option-check" aria-hidden="true"></span>
+        </button>
       </div>
     </div>
     <button id="btn-motion" type="button" hidden
@@ -4931,6 +5441,7 @@
           <button data-action="reach-share-card" type="button" role="menuitem" tabindex="-1" hidden disabled><span class="export-item-copy"><strong>{{i18n:viewer.export.reachShareCard}}</strong><small class="hint">1200&times;630 PNG</small></span></button>
           <button data-action="copy-share-card" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>{{i18n:viewer.export.copyShareCard}}</strong><small class="hint">{{i18n:viewer.export.clipboardPng}}</small></span></button>
           <button data-action="copy" type="button" role="menuitem" tabindex="-1"><span class="export-item-copy"><strong>{{i18n:viewer.export.copyDiagram}}</strong><small class="hint">{{i18n:viewer.export.clipboardPng}}</small></span></button>
+          <button data-action="copy-change-notes" type="button" role="menuitem" tabindex="-1" hidden disabled><span class="export-item-copy"><strong>{{i18n:viewer.export.copyChangeNotes}}</strong><small class="hint">{{i18n:viewer.export.clipboardMarkdown}}</small></span></button>
         </div>
         <div class="export-menu-section" role="group" aria-label="{{i18n:viewer.export.raster}}">
           <span class="export-menu-heading" aria-hidden="true">{{i18n:viewer.export.image}}</span>
@@ -4953,7 +5464,8 @@
       <div class="header-row"
            data-preset-badge-signal-flow="{{i18n:viewer.preset.badge.signalFlow}}"
            data-preset-badge-blueprint="{{i18n:viewer.preset.badge.blueprint}}"
-           data-preset-badge-editorial="{{i18n:viewer.preset.badge.editorial}}">
+           data-preset-badge-editorial="{{i18n:viewer.preset.badge.editorial}}"
+           data-preset-badge-4crux="{{i18n:viewer.preset.badge.4crux}}">
         <div class="pulse-dot"></div>
         <h1>[PROJECT NAME] Architecture</h1>
       </div>
@@ -5208,7 +5720,7 @@
           </button>
         </div>
         <div class="diagram-guide-shortcuts" aria-label="{{i18n:viewer.guide.shortcuts}}">
-          <span><kbd>E</kbd> {{i18n:viewer.guide.shortcut.export}}</span><span><kbd>T</kbd> {{i18n:viewer.guide.shortcut.theme}}</span><span><kbd>S</kbd> {{i18n:viewer.guide.shortcut.style}}</span><span><kbd>0</kbd> {{i18n:viewer.guide.shortcut.reset}}</span><span><kbd>+</kbd> {{i18n:viewer.guide.shortcut.zoomIn}}</span><span><kbd>-</kbd> {{i18n:viewer.guide.shortcut.zoomOut}}</span><span><kbd>Esc</kbd> {{i18n:viewer.guide.shortcut.close}}</span>
+          <span><kbd>E</kbd> {{i18n:viewer.guide.shortcut.export}}</span><span><kbd>T</kbd> {{i18n:viewer.guide.shortcut.theme}}</span><span><kbd>S</kbd> {{i18n:viewer.guide.shortcut.style}}</span><span><kbd>A</kbd> {{i18n:viewer.guide.shortcut.notes}}</span><span><kbd>0</kbd> {{i18n:viewer.guide.shortcut.reset}}</span><span><kbd>+</kbd> {{i18n:viewer.guide.shortcut.zoomIn}}</span><span><kbd>-</kbd> {{i18n:viewer.guide.shortcut.zoomOut}}</span><span><kbd>Esc</kbd> {{i18n:viewer.guide.shortcut.close}}</span>
         </div>
         <p class="diagram-guide-feedback" id="diagram-guide-feedback" aria-live="polite"></p>
       </div>
@@ -5310,6 +5822,36 @@
           <button id="semantic-lens-clear" type="button" aria-label="{{i18n:viewer.lens.clear}}">{{i18n:viewer.common.clear}}</button>
         </div>
       </div>
+      <div class="change-notes no-print" id="change-notes" hidden role="dialog" aria-modal="false" aria-labelledby="change-notes-title">
+        <div class="change-notes-head">
+          <span>
+            <span class="change-notes-eyebrow">{{i18n:viewer.notes.eyebrow}}</span>
+            <strong class="change-notes-title" id="change-notes-title">{{i18n:viewer.notes.title}}</strong>
+          </span>
+          <button class="change-notes-close" id="change-notes-close" type="button" aria-label="{{i18n:viewer.notes.close}}">&#215;</button>
+        </div>
+        <p class="change-notes-instruction">{{i18n:viewer.notes.instruction}}</p>
+        <div class="change-notes-editor" id="change-notes-editor" hidden>
+          <div class="change-notes-target">
+            <span class="change-notes-target-kind" id="change-notes-target-kind"></span>
+            <strong class="change-notes-target-label" id="change-notes-target-label"></strong>
+            <code class="change-notes-target-id" id="change-notes-target-id"></code>
+          </div>
+          <label class="change-notes-label" for="change-notes-text">{{i18n:viewer.notes.textLabel}}</label>
+          <textarea id="change-notes-text" rows="4" maxlength="4000" placeholder="{{i18n:viewer.notes.placeholder}}"></textarea>
+          <div class="change-notes-editor-actions">
+            <button id="change-notes-delete" type="button" hidden>{{i18n:viewer.notes.delete}}</button>
+            <button id="change-notes-cancel" type="button">{{i18n:viewer.notes.cancel}}</button>
+            <button id="change-notes-save" type="button">{{i18n:viewer.notes.save}}</button>
+          </div>
+        </div>
+        <ul class="change-notes-list" id="change-notes-list" aria-label="{{i18n:viewer.notes.list}}"></ul>
+        <p class="change-notes-status" id="change-notes-status" aria-live="polite">{{i18n:viewer.notes.status.ready}}</p>
+        <div class="change-notes-actions">
+          <button id="change-notes-clear" type="button" disabled>{{i18n:viewer.notes.clearAll}}</button>
+          <button id="change-notes-copy" type="button" disabled>{{i18n:viewer.notes.copy}}</button>
+        </div>
+      </div>
       <div class="overview-map no-print" id="overview-map" hidden role="region" aria-labelledby="overview-map-title">
         <div class="overview-map-head">
           <span class="overview-map-live" aria-hidden="true"></span>
@@ -5325,6 +5867,7 @@
       </div>
       <p class="overview-map-feedback no-print" id="overview-map-feedback" role="status" aria-live="polite" hidden>{{i18n:viewer.radar.space}}</p>
       <div class="diagram-nav no-print" role="toolbar" aria-label="{{i18n:viewer.nav.controls}}">
+        <button id="btn-change-notes" type="button" aria-label="{{i18n:viewer.nav.notes}}" aria-haspopup="dialog" aria-expanded="false" aria-pressed="false" aria-controls="change-notes" title="{{i18n:viewer.nav.notes.title}}">{{i18n:viewer.nav.notes.short}}<span class="change-notes-count" data-change-notes-count hidden>0</span></button>
         <button id="btn-route-probe" type="button" aria-label="{{i18n:viewer.nav.route}}" aria-pressed="false" aria-controls="route-probe" title="{{i18n:viewer.nav.route.title}}">{{i18n:viewer.nav.route.short}}</button>
         <button id="btn-overview-map" type="button" aria-label="{{i18n:viewer.nav.radar}}" aria-expanded="false" aria-controls="overview-map" title="{{i18n:viewer.nav.radar.title}}">{{i18n:viewer.nav.radar.short}}</button>
         <button id="btn-semantic-lens" type="button" aria-label="{{i18n:viewer.nav.lens}}" aria-haspopup="dialog" aria-expanded="false" aria-pressed="false" aria-controls="semantic-lens" title="{{i18n:viewer.nav.lens.title}}">{{i18n:viewer.nav.lens.short}}</button>
@@ -5437,18 +5980,19 @@
     }
 
     /* ============================================================
-       Visual style try-on — one topology, four bundled presets.
+       Visual style try-on — one topology, five bundled presets.
        The reader's choice is intentionally session-only: it updates the
        live page and canonical SVG together, but never rewrites the source,
        URL, or a later diagram's authored default.
        ============================================================ */
     Archify.preset = (function () {
-      var PRESETS = ['classic', 'signal-flow', 'blueprint', 'editorial'];
+      var PRESETS = ['classic', 'signal-flow', 'blueprint', 'editorial', '4crux'];
       var LABELS = {
         classic: viewerText('viewer.preset.classic.short'),
         'signal-flow': viewerText('viewer.preset.flow.short'),
         blueprint: viewerText('viewer.preset.blueprint'),
-        editorial: viewerText('viewer.preset.editorial')
+        editorial: viewerText('viewer.preset.editorial'),
+        '4crux': viewerText('viewer.preset.4crux')
       };
       var html = document.documentElement;
       var svg = document.querySelector('.diagram-container svg');
@@ -5892,6 +6436,9 @@
         Array.prototype.forEach.call(clone.querySelectorAll('[data-intent-trace-overlay]'), function (el) {
           el.remove();
         });
+        Array.prototype.forEach.call(clone.querySelectorAll('[data-annotation-overlay]'), function (el) {
+          el.remove();
+        });
         Array.prototype.forEach.call(clone.querySelectorAll('[data-route-probe-overlay]'), function (el) {
           el.remove();
         });
@@ -6028,7 +6575,7 @@
           !clone.hasAttribute('data-chapter-preview') &&
           !clone.style.getPropertyValue('transform') &&
           !clone.style.getPropertyValue('clip-path') &&
-          clone.querySelectorAll('[data-story-overlay], [data-story-carrier-overlay], [data-story-carrier-token], [data-story-step], [data-story-beat-state], [data-story-beat-step], [data-chapter-handoff-overlay], [data-chapter-role], [data-chapter-preview-role], [data-focus-match], [data-focus-selected], [data-reach-match], [data-reach-origin], [data-reach-depth], [data-semantic-lens-overlay], [data-lens-match], [data-lens-selected], [data-lens-peer], [data-legend-bridge], [data-legend-kind], [data-legend-bridge-runtime], [data-legend-count], [data-legend-zero], [data-legend-selected], [data-legend-preview-match], [data-legend-preview-selected], [data-legend-preview-peer], [data-relationship-hit-overlay], [data-relationship-pulse-overlay], [data-relationship-preview], [data-relationship-preview-node], [data-relationship-preview-source], [data-relationship-preview-target], [data-intent-trace-overlay], [data-intent-trace-match], [data-intent-trace-selected], [data-route-probe-overlay], [data-route-journey-overlay], [data-route-match], [data-route-start], [data-route-end], [data-route-step], [data-route-candidate], [data-route-journey-state], [data-route-journey-current], [data-share-route-match], [data-share-route-step], [data-share-route-start], [data-share-route-end], [data-share-route-middle], [data-share-reach-match], [data-share-reach-origin], [data-share-reach-depth], [data-source-evidence-beacon], [data-source-evidence-count], [data-source-evidence-original-label], [data-detail], [data-detail-anchor]').length === 0;
+          clone.querySelectorAll('[data-story-overlay], [data-story-carrier-overlay], [data-story-carrier-token], [data-story-step], [data-story-beat-state], [data-story-beat-step], [data-chapter-handoff-overlay], [data-chapter-role], [data-chapter-preview-role], [data-focus-match], [data-focus-selected], [data-reach-match], [data-reach-origin], [data-reach-depth], [data-semantic-lens-overlay], [data-lens-match], [data-lens-selected], [data-lens-peer], [data-legend-bridge], [data-legend-kind], [data-legend-bridge-runtime], [data-legend-count], [data-legend-zero], [data-legend-selected], [data-legend-preview-match], [data-legend-preview-selected], [data-legend-preview-peer], [data-relationship-hit-overlay], [data-relationship-pulse-overlay], [data-relationship-preview], [data-relationship-preview-node], [data-relationship-preview-source], [data-relationship-preview-target], [data-intent-trace-overlay], [data-intent-trace-match], [data-intent-trace-selected], [data-route-probe-overlay], [data-route-journey-overlay], [data-route-match], [data-route-start], [data-route-end], [data-route-step], [data-route-candidate], [data-route-journey-state], [data-route-journey-current], [data-share-route-match], [data-share-route-step], [data-share-route-start], [data-share-route-end], [data-share-route-middle], [data-share-reach-match], [data-share-reach-origin], [data-share-reach-depth], [data-source-evidence-beacon], [data-source-evidence-count], [data-source-evidence-original-label], [data-detail], [data-detail-anchor], [data-annotation-overlay], [data-annotation-marker], [data-annotation-editing]').length === 0;
 
         var vb = svg.viewBox.baseVal;
         var finiteSvgDimensions = Number.isFinite(vb.x) && Number.isFinite(vb.y) &&
@@ -6713,6 +7260,23 @@
         reachShareItem.disabled = !snapshot;
         return snapshot;
       }
+      var changeNotesItem = menu.querySelector('button[data-action="copy-change-notes"]');
+      function syncChangeNotesItem() {
+        var count = Archify.changeNotes && typeof Archify.changeNotes.notes === 'function'
+          ? Archify.changeNotes.notes().length
+          : 0;
+        changeNotesItem.hidden = !count;
+        changeNotesItem.disabled = !count;
+        return count;
+      }
+      function runCopyChangeNotes() {
+        close(false);
+        if (!Archify.changeNotes) return Promise.resolve(false);
+        return Archify.changeNotes.copy().then(function (copied) {
+          toast(viewerText(copied ? 'viewer.notes.toast.copied' : 'viewer.common.copyFailed'));
+          return copied;
+        });
+      }
 
       // ---- Clipboard support ----------------------------------------------
       function canCopyImage() {
@@ -6773,6 +7337,7 @@
         if (Archify.semanticLens && Archify.semanticLens.isOpen()) Archify.semanticLens.close({ restoreFocus: false });
         syncRouteShareItem();
         syncReachShareItem();
+        syncChangeNotesItem();
         menu.classList.add('open');
         btn.setAttribute('aria-expanded', 'true');
         var available = items().filter(function (i) { return !i.hidden && !i.disabled; });
@@ -7033,6 +7598,9 @@
         var copyShareCardBtn = e.target.closest('button[data-action="copy-share-card"]');
         if (copyShareCardBtn && !copyShareCardBtn.disabled) { runCopyShareCard(); return; }
 
+        var changeNotesBtn = e.target.closest('button[data-action="copy-change-notes"]');
+        if (changeNotesBtn && !changeNotesBtn.disabled && !changeNotesBtn.hidden) { runCopyChangeNotes(); return; }
+
         var copyBtn = e.target.closest('button[data-action="copy"]');
         if (copyBtn && !copyBtn.disabled) { runCopy(); return; }
 
@@ -7051,6 +7619,8 @@
         downloadReachShareCard: runReachShareCard,
         syncRouteShare: syncRouteShareItem,
         syncReachShare: syncReachShareItem,
+        syncChangeNotes: syncChangeNotesItem,
+        copyChangeNotes: runCopyChangeNotes,
         copyShareCard: runCopyShareCard
       };
 
@@ -11785,7 +12355,7 @@
       outBtn.addEventListener('click', function () { zoom(state.scale - 0.25); });
       resetBtn.addEventListener('click', reset);
       container.addEventListener('pointerdown', function (event) {
-        if (state.scale <= 1 || event.button !== 0 || event.target.closest('.diagram-nav, .focus-chip, .node-finder, .diagram-guide, .overview-map, .route-probe, .semantic-lens') || event.target.closest('[data-node-id]') || event.target.closest('[data-relationship-hit-key]')) return;
+        if (state.scale <= 1 || event.button !== 0 || event.target.closest('.diagram-nav, .focus-chip, .node-finder, .diagram-guide, .overview-map, .route-probe, .semantic-lens, .change-notes') || event.target.closest('[data-node-id]') || event.target.closest('[data-relationship-hit-key]')) return;
         interruptCamera();
         drag = { startX: event.clientX, startY: event.clientY, x: state.x, y: state.y, moved: false };
         container.classList.add('is-panning');
@@ -14508,6 +15078,708 @@
     })();
 
     /* ============================================================
+       Change Notes — reader-authored change requests over the compiled
+       semantic graph. In Notes mode a click on a node, structural frame
+       (lane, stage, segment, boundary), or relationship opens a small
+       editor; the reader writes what should change and later copies one
+       structured report for an AI assistant or a teammate. Notes are
+       viewer state: they live only in this browser (localStorage keyed by
+       a digest of the authored topology), draw as a removable overlay,
+       and never enter the canonical SVG or any export.
+       ============================================================ */
+    Archify.changeNotes = (function () {
+      var STORAGE_PREFIX = 'archify-change-notes:';
+      var MAX_TEXT_LENGTH = 4000;
+      var html = document.documentElement;
+      var container = document.querySelector('.diagram-container');
+      var svg = container.querySelector(':scope > svg');
+      var trigger = document.getElementById('btn-change-notes');
+      var countBadge = document.querySelector('[data-change-notes-count]');
+      var panel = document.getElementById('change-notes');
+      var closeBtn = document.getElementById('change-notes-close');
+      var editor = document.getElementById('change-notes-editor');
+      var targetKind = document.getElementById('change-notes-target-kind');
+      var targetLabel = document.getElementById('change-notes-target-label');
+      var targetId = document.getElementById('change-notes-target-id');
+      var textarea = document.getElementById('change-notes-text');
+      var saveBtn = document.getElementById('change-notes-save');
+      var deleteBtn = document.getElementById('change-notes-delete');
+      var cancelBtn = document.getElementById('change-notes-cancel');
+      var list = document.getElementById('change-notes-list');
+      var status = document.getElementById('change-notes-status');
+      var copyBtn = document.getElementById('change-notes-copy');
+      var clearBtn = document.getElementById('change-notes-clear');
+      var namespace = 'http://www.w3.org/2000/svg';
+      var enabled = false;
+      var notes = [];
+      var editing = null;
+      var overlay = null;
+      var opener = trigger;
+      var storageKey = null;
+      var copyResetTimer = null;
+
+      // ---- Compiled graph facts (read from the authored DOM, never stored) ----
+      function nodeLabel(node, fallback) {
+        return node.getAttribute('data-node-label') || (node.getAttribute('aria-label') || fallback).replace(/^Focus\s+/, '');
+      }
+      function nodes() { return Array.prototype.slice.call(svg.querySelectorAll('[data-node-id]')); }
+      function nodesById() {
+        var byId = {};
+        nodes().forEach(function (node) {
+          var id = node.getAttribute('data-node-id');
+          if (id && !byId[id]) byId[id] = node;
+        });
+        return byId;
+      }
+      function edges() { return Array.prototype.slice.call(svg.querySelectorAll('[data-edge-from][data-edge-to]')); }
+      function relationshipKey(from, to, label) { return from + '\u0000' + to + '\u0000' + (label || ''); }
+      function relationships() {
+        var seen = {};
+        var result = [];
+        edges().forEach(function (edge) {
+          var from = edge.getAttribute('data-edge-from');
+          var to = edge.getAttribute('data-edge-to');
+          var label = edge.getAttribute('data-edge-label') || '';
+          var key = edge.getAttribute('data-edge-key') || relationshipKey(from, to, label);
+          if (!from || !to || seen[key]) return;
+          seen[key] = true;
+          result.push({ key: key, id: edge.getAttribute('data-edge-id') || '', from: from, to: to, label: label, element: edge });
+        });
+        return result;
+      }
+      function relationshipByKey(key) {
+        return relationships().filter(function (relationship) { return relationship.key === key; })[0] || null;
+      }
+      function frames() {
+        var seen = {};
+        var result = [];
+        Array.prototype.forEach.call(svg.querySelectorAll('[data-graph-role="structural-frame"][data-composition-frame-id]'), function (frame) {
+          var id = frame.getAttribute('data-composition-frame-id');
+          if (!id || seen[id]) return;
+          seen[id] = true;
+          result.push({
+            id: id,
+            kind: frame.getAttribute('data-composition-frame-kind') || 'frame',
+            label: frame.getAttribute('data-composition-frame-label') || '',
+            element: frame
+          });
+        });
+        return result;
+      }
+      function frameById(id) {
+        return frames().filter(function (frame) { return frame.id === id; })[0] || null;
+      }
+      function diagramTitle() {
+        var titleNode = svg.querySelector('#archify-diagram-title');
+        var headerNode = document.querySelector('.header h1');
+        return (titleNode && titleNode.textContent) || (headerNode && headerNode.textContent) || document.title || '';
+      }
+      function diagramType() {
+        var meta = document.querySelector('meta[name="archify-diagram-type"]');
+        return meta ? (meta.getAttribute('content') || 'diagram') : 'diagram';
+      }
+      function describeRelationship(relationship, byId) {
+        byId = byId || nodesById();
+        var fromLabel = byId[relationship.from] ? nodeLabel(byId[relationship.from], relationship.from) : relationship.from;
+        var toLabel = byId[relationship.to] ? nodeLabel(byId[relationship.to], relationship.to) : relationship.to;
+        return fromLabel + ' → ' + toLabel + (relationship.label ? ' (' + relationship.label + ')' : '');
+      }
+
+      // ---- Targets ------------------------------------------------------
+      function targetKeyOf(target) { return target.type + ':' + (target.type === 'relationship' ? target.key : target.id); }
+      function nodeTarget(node) {
+        var id = node.getAttribute('data-node-id');
+        return { type: 'node', id: id, label: nodeLabel(node, id), kind: node.getAttribute('data-node-kind') || 'node' };
+      }
+      function relationshipTarget(relationship) {
+        return {
+          type: 'relationship',
+          key: relationship.key,
+          id: relationship.id || '',
+          from: relationship.from,
+          to: relationship.to,
+          label: describeRelationship(relationship),
+          kind: 'relationship'
+        };
+      }
+      function frameTarget(frame) {
+        return { type: 'frame', id: frame.id, label: frame.label || (frame.kind + ' ' + frame.id), kind: frame.kind };
+      }
+      function resolveTarget(element) {
+        if (!element || typeof element.closest !== 'function') return null;
+        var node = element.closest('[data-node-id]');
+        if (node) return nodeTarget(node);
+        var hit = element.closest('[data-relationship-hit-key]');
+        if (hit) {
+          var hitRelationship = relationshipByKey(hit.getAttribute('data-relationship-key') || hit.getAttribute('data-relationship-hit-key'));
+          if (hitRelationship) return relationshipTarget(hitRelationship);
+        }
+        var edge = element.closest('[data-edge-from][data-edge-to]');
+        if (edge) {
+          var from = edge.getAttribute('data-edge-from');
+          var to = edge.getAttribute('data-edge-to');
+          var key = edge.getAttribute('data-edge-key') || relationshipKey(from, to, edge.getAttribute('data-edge-label') || '');
+          var edgeRelationship = relationshipByKey(key);
+          if (edgeRelationship) return relationshipTarget(edgeRelationship);
+        }
+        var frame = element.closest('[data-composition-frame-id]');
+        if (frame) {
+          var found = frameById(frame.getAttribute('data-composition-frame-id'));
+          if (found) return frameTarget(found);
+        }
+        return null;
+      }
+      function targetElement(target) {
+        if (target.type === 'node') return nodesById()[target.id] || null;
+        if (target.type === 'relationship') {
+          var relationship = relationshipByKey(target.key);
+          return relationship ? relationship.element : null;
+        }
+        var frame = frameById(target.id);
+        return frame ? frame.element : null;
+      }
+      function targetExists(target) { return !!targetElement(target); }
+      function refreshTarget(target) {
+        var element = targetElement(target);
+        if (!element) return target;
+        if (target.type === 'node') return nodeTarget(element);
+        if (target.type === 'relationship') {
+          var relationship = relationshipByKey(target.key);
+          return relationship ? relationshipTarget(relationship) : target;
+        }
+        var frame = frameById(target.id);
+        return frame ? frameTarget(frame) : target;
+      }
+
+      // ---- Persistence (browser-local, digest-keyed, fail-safe) ----------
+      function fnv1a(value) {
+        var hash = 0x811c9dc5;
+        for (var index = 0; index < value.length; index += 1) {
+          hash ^= value.charCodeAt(index);
+          hash = Math.imul(hash, 0x01000193) >>> 0;
+        }
+        return ('00000000' + hash.toString(16)).slice(-8);
+      }
+      function topologyDigest() {
+        var ids = nodes().map(function (node) { return node.getAttribute('data-node-id'); }).sort();
+        var keys = relationships().map(function (relationship) { return relationship.key; }).sort();
+        return fnv1a([diagramType(), diagramTitle()].concat(ids, keys).join('\u0001'));
+      }
+      function isNote(value) {
+        return !!value && typeof value === 'object' && typeof value.id === 'string' && typeof value.text === 'string' &&
+          value.target && typeof value.target === 'object' && typeof value.target.type === 'string';
+      }
+      function readStored() {
+        try {
+          var raw = localStorage.getItem(storageKey);
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          return Array.isArray(parsed && parsed.notes) ? parsed.notes.filter(isNote) : [];
+        } catch (_) { return []; }
+      }
+      function writeStored() {
+        try {
+          if (!notes.length) localStorage.removeItem(storageKey);
+          else localStorage.setItem(storageKey, JSON.stringify({ version: 1, diagram: diagramTitle(), type: diagramType(), notes: notes }));
+        } catch (_) {}
+      }
+      function noteId() { return 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+      function noteFor(target) {
+        var key = targetKeyOf(target);
+        return notes.filter(function (note) { return targetKeyOf(note.target) === key; })[0] || null;
+      }
+
+      // ---- Overlay markers (viewer-only, stripped from every export) ------
+      function localBox(element) {
+        var box;
+        try { box = element.getBBox(); } catch (_) { return null; }
+        if (!box || !Number.isFinite(box.width) || !Number.isFinite(box.height)) return null;
+        var toRoot;
+        try {
+          var rootCtm = svg.getScreenCTM();
+          var ownCtm = element.getScreenCTM();
+          if (rootCtm && ownCtm) toRoot = rootCtm.inverse().multiply(ownCtm);
+        } catch (_) { toRoot = null; }
+        if (!toRoot) return { x: box.x, y: box.y, width: box.width, height: box.height };
+        var corners = [[box.x, box.y], [box.x + box.width, box.y], [box.x, box.y + box.height], [box.x + box.width, box.y + box.height]];
+        var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE, maxX = -Number.MAX_VALUE, maxY = -Number.MAX_VALUE;
+        corners.forEach(function (corner) {
+          var x = toRoot.a * corner[0] + toRoot.c * corner[1] + toRoot.e;
+          var y = toRoot.b * corner[0] + toRoot.d * corner[1] + toRoot.f;
+          minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+        });
+        return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+      }
+      function ensureOverlay() {
+        if (overlay && overlay.parentNode === svg) return overlay;
+        overlay = document.createElementNS(namespace, 'g');
+        overlay.setAttribute('class', 'change-notes-overlay');
+        overlay.setAttribute('data-annotation-overlay', '');
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.setAttribute('pointer-events', 'none');
+        svg.appendChild(overlay);
+        return overlay;
+      }
+      function renderMarkers() {
+        var root = ensureOverlay();
+        while (root.firstChild) root.removeChild(root.firstChild);
+        notes.forEach(function (note, index) {
+          var element = targetElement(note.target);
+          if (!element) return;
+          var box = localBox(element);
+          if (!box) return;
+          var marker = document.createElementNS(namespace, 'g');
+          marker.setAttribute('class', 'change-note-marker change-note-marker-' + note.target.type);
+          marker.setAttribute('data-annotation-marker', targetKeyOf(note.target));
+          if (editing && targetKeyOf(editing.target) === targetKeyOf(note.target)) marker.setAttribute('data-annotation-editing', 'true');
+          var pad = note.target.type === 'relationship' ? 2 : 4;
+          var outline = document.createElementNS(namespace, 'rect');
+          outline.setAttribute('class', 'change-note-outline');
+          outline.setAttribute('x', (box.x - pad).toFixed(2));
+          outline.setAttribute('y', (box.y - pad).toFixed(2));
+          outline.setAttribute('width', Math.max(8, box.width + pad * 2).toFixed(2));
+          outline.setAttribute('height', Math.max(8, box.height + pad * 2).toFixed(2));
+          outline.setAttribute('rx', '6');
+          marker.appendChild(outline);
+          var badgeX = note.target.type === 'relationship' ? box.x + box.width / 2 : box.x + box.width + pad;
+          var badgeY = note.target.type === 'relationship' ? box.y + box.height / 2 : box.y - pad;
+          var badge = document.createElementNS(namespace, 'circle');
+          badge.setAttribute('class', 'change-note-badge');
+          badge.setAttribute('cx', badgeX.toFixed(2));
+          badge.setAttribute('cy', badgeY.toFixed(2));
+          badge.setAttribute('r', '8');
+          marker.appendChild(badge);
+          var number = document.createElementNS(namespace, 'text');
+          number.setAttribute('class', 'change-note-number');
+          number.setAttribute('x', badgeX.toFixed(2));
+          number.setAttribute('y', (badgeY + 0.5).toFixed(2));
+          number.setAttribute('text-anchor', 'middle');
+          number.setAttribute('dominant-baseline', 'central');
+          number.setAttribute('font-size', '9');
+          number.setAttribute('font-weight', '800');
+          number.textContent = String(index + 1);
+          marker.appendChild(number);
+          root.appendChild(marker);
+        });
+        if (!notes.length && overlay && overlay.parentNode === svg) {
+          svg.removeChild(overlay);
+          overlay = null;
+        }
+      }
+
+      // ---- Docking: keep the panel away from the element being annotated ----
+      function overlapArea(a, b) {
+        var width = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+        var height = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        return width > 0 && height > 0 ? width * height : 0;
+      }
+      function dockPanel() {
+        if (panel.hidden) return null;
+        panel.style.left = '';
+        panel.style.top = '';
+        var containerRect = container.getBoundingClientRect();
+        var panelRect = panel.getBoundingClientRect();
+        var width = panelRect.width || 352;
+        var height = panelRect.height || 240;
+        var gap = 24;
+        var dock = null;
+        if (window.innerWidth > 720) {
+          if (window.innerWidth - containerRect.right >= width + gap * 2) dock = 'outside-right';
+          else if (containerRect.left >= width + gap * 2) dock = 'outside-left';
+        }
+        if (dock) {
+          panel.setAttribute('data-dock', dock);
+          var left = dock === 'outside-right' ? containerRect.right + gap : containerRect.left - gap - width;
+          var top = Math.max(16, Math.min(containerRect.top, window.innerHeight - height - 16));
+          panel.style.left = Math.round(left) + 'px';
+          panel.style.top = Math.round(top) + 'px';
+          return dock;
+        }
+        var targetRect = editing ? (function () {
+          var element = targetElement(editing.target);
+          return element ? element.getBoundingClientRect() : null;
+        })() : null;
+        var nodeRects = nodes().map(function (node) { return node.getBoundingClientRect(); });
+        var nav = container.querySelector('.diagram-nav');
+        var navRect = nav ? nav.getBoundingClientRect() : null;
+        var inset = 16;
+        var candidates = {
+          'top-left': { left: containerRect.left + inset, top: containerRect.top + inset },
+          'top-right': { left: containerRect.right - inset - width, top: containerRect.top + inset },
+          'bottom-left': { left: containerRect.left + inset, top: containerRect.bottom - inset - height - (navRect ? navRect.height + 12 : 0) },
+          'bottom-right': { left: containerRect.right - inset - width, top: containerRect.bottom - inset - height - (navRect ? navRect.height + 12 : 0) }
+        };
+        var best = 'bottom-right';
+        var bestScore = Number.MAX_VALUE;
+        ['bottom-right', 'bottom-left', 'top-right', 'top-left'].forEach(function (key) {
+          var rect = { left: candidates[key].left, top: candidates[key].top, right: candidates[key].left + width, bottom: candidates[key].top + height };
+          var score = nodeRects.reduce(function (sum, nodeRect) { return sum + overlapArea(rect, nodeRect); }, 0);
+          if (targetRect) score += overlapArea(rect, targetRect) * 1000;
+          if (score < bestScore) { bestScore = score; best = key; }
+        });
+        panel.setAttribute('data-dock', best);
+        return best;
+      }
+
+      // ---- Panel -----------------------------------------------------------
+      function setStatus(text) { status.textContent = text; }
+      function updateTrigger() {
+        trigger.setAttribute('aria-pressed', String(enabled));
+        trigger.setAttribute('aria-expanded', String(!panel.hidden));
+        trigger.title = enabled ? viewerText('viewer.notes.trigger.on') : viewerText('viewer.notes.trigger.off');
+        countBadge.textContent = String(notes.length);
+        countBadge.hidden = !notes.length;
+        copyBtn.disabled = !notes.length;
+        clearBtn.disabled = !notes.length;
+      }
+      function renderList() {
+        while (list.firstChild) list.removeChild(list.firstChild);
+        if (!notes.length) {
+          var emptyItem = document.createElement('li');
+          emptyItem.className = 'change-notes-empty';
+          emptyItem.textContent = viewerText('viewer.notes.empty');
+          list.appendChild(emptyItem);
+          return;
+        }
+        notes.forEach(function (note, index) {
+          var item = document.createElement('li');
+          var button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'change-notes-item';
+          button.setAttribute('data-change-note-id', note.id);
+          if (editing && editing.noteId === note.id) button.setAttribute('aria-current', 'true');
+          var missing = !targetExists(note.target);
+          if (missing) button.setAttribute('data-missing', 'true');
+          var index_ = document.createElement('span');
+          index_.className = 'change-notes-item-index';
+          index_.textContent = String(index + 1);
+          var copy = document.createElement('span');
+          copy.className = 'change-notes-item-copy';
+          var head = document.createElement('strong');
+          head.textContent = note.target.label;
+          var kind = document.createElement('em');
+          kind.textContent = viewerKindLabel(note.target.kind) + (missing ? ' · ' + viewerText('viewer.notes.missing') : '');
+          var text = document.createElement('small');
+          text.textContent = note.text;
+          copy.appendChild(head);
+          copy.appendChild(kind);
+          copy.appendChild(text);
+          button.appendChild(index_);
+          button.appendChild(copy);
+          item.appendChild(button);
+          list.appendChild(item);
+        });
+      }
+      function render() {
+        renderList();
+        renderMarkers();
+        updateTrigger();
+      }
+      function closeEditor(options) {
+        options = options || {};
+        editing = null;
+        editor.hidden = true;
+        textarea.value = '';
+        render();
+        if (options.restoreFocus !== false && !panel.hidden) trigger.focus();
+      }
+      function openEditor(target) {
+        var existing = noteFor(target);
+        editing = { target: target, noteId: existing ? existing.id : null };
+        targetKind.textContent = viewerKindLabel(target.kind);
+        targetLabel.textContent = target.label;
+        targetId.textContent = target.type === 'relationship'
+          ? (target.id ? target.id : target.from + ' → ' + target.to)
+          : target.id;
+        textarea.value = existing ? existing.text : '';
+        deleteBtn.hidden = !existing;
+        editor.hidden = false;
+        setStatus(viewerText(existing ? 'viewer.notes.status.editing' : 'viewer.notes.status.new', { label: target.label }));
+        if (panel.hidden) open({ opener: trigger, focusEditor: true });
+        render();
+        dockPanel();
+        textarea.focus();
+        return true;
+      }
+      function saveEditor() {
+        if (!editing) return false;
+        var text = textarea.value.replace(/\s+$/, '');
+        if (!text.trim()) {
+          setStatus(viewerText('viewer.notes.status.blank'));
+          textarea.focus();
+          return false;
+        }
+        if (text.length > MAX_TEXT_LENGTH) text = text.slice(0, MAX_TEXT_LENGTH);
+        var now = new Date().toISOString();
+        var existing = editing.noteId ? notes.filter(function (note) { return note.id === editing.noteId; })[0] : null;
+        if (existing) {
+          existing.text = text;
+          existing.target = refreshTarget(editing.target);
+          existing.updatedAt = now;
+        } else {
+          notes.push({ id: noteId(), target: editing.target, text: text, createdAt: now, updatedAt: now });
+        }
+        writeStored();
+        var label = editing.target.label;
+        closeEditor({ restoreFocus: false });
+        setStatus(viewerText('viewer.notes.status.saved', { label: label, count: notes.length }));
+        trigger.focus();
+        return true;
+      }
+      function deleteEditing() {
+        if (!editing || !editing.noteId) return false;
+        var id = editing.noteId;
+        notes = notes.filter(function (note) { return note.id !== id; });
+        writeStored();
+        closeEditor({ restoreFocus: false });
+        setStatus(viewerText('viewer.notes.status.deleted', { count: notes.length }));
+        trigger.focus();
+        return true;
+      }
+      function clearAll() {
+        if (!notes.length) return false;
+        notes = [];
+        writeStored();
+        closeEditor({ restoreFocus: false });
+        setStatus(viewerText('viewer.notes.status.cleared'));
+        return true;
+      }
+      function editNote(id) {
+        var note = notes.filter(function (candidate) { return candidate.id === id; })[0];
+        if (!note) return false;
+        return openEditor(refreshTarget(note.target));
+      }
+
+      // ---- Report -------------------------------------------------------
+      function neighborLines(target, byId, relationshipsList) {
+        var incoming = [];
+        var outgoing = [];
+        relationshipsList.forEach(function (relationship) {
+          if (relationship.to === target.id) incoming.push(describeRelationship(relationship, byId));
+          if (relationship.from === target.id) outgoing.push(describeRelationship(relationship, byId));
+        });
+        return { incoming: incoming, outgoing: outgoing };
+      }
+      function report() {
+        var byId = nodesById();
+        var relationshipsList = relationships();
+        var title = diagramTitle();
+        var type = diagramType();
+        var preset = html.getAttribute('data-preset') || 'classic';
+        var stamp = new Date().toISOString().replace('T', ' ').slice(0, 16);
+        var lines = [];
+        lines.push('# Change requests — ' + title);
+        lines.push('');
+        lines.push('- Diagram type: ' + type);
+        lines.push('- Visual preset: ' + preset);
+        lines.push('- Exported from the Archify viewer: ' + stamp + ' UTC');
+        lines.push('- Notes: ' + notes.length);
+        lines.push('');
+        lines.push('Each note below is a change request for the Archify JSON source of this diagram. Element ids are the stable `id` values authored in that source; relationships are named by their `from`/`to` ids and label. Apply the requests, keep every unrelated node, relationship, and label unchanged, then re-validate the diagram.');
+        lines.push('');
+        notes.forEach(function (note, index) {
+          var target = refreshTarget(note.target);
+          var heading;
+          if (target.type === 'node') heading = 'Node "' + target.label + '" (`' + target.id + '`, ' + target.kind + ')';
+          else if (target.type === 'relationship') heading = 'Relationship ' + target.label + (target.id ? ' (`' + target.id + '`)' : '') + ' [' + target.from + ' → ' + target.to + ']';
+          else heading = viewerKindLabel(target.kind) + ' "' + target.label + '" (`' + target.id + '`)';
+          lines.push('## ' + (index + 1) + '. ' + heading);
+          if (!targetExists(target)) lines.push('- Status: the element is no longer present in the current artifact');
+          if (target.type === 'node') {
+            var node = byId[target.id];
+            if (node) {
+              var sublabel = node.getAttribute('data-node-sublabel');
+              var context = node.getAttribute('data-node-context');
+              var tag = node.getAttribute('data-node-tag');
+              var brand = node.getAttribute('data-node-brand');
+              if (sublabel) lines.push('- Detail: ' + sublabel);
+              if (context) lines.push('- Context: ' + context);
+              if (tag) lines.push('- Tag: ' + tag);
+              if (brand) lines.push('- Brand: ' + brand);
+            }
+            var neighbors = neighborLines(target, byId, relationshipsList);
+            lines.push('- Incoming: ' + (neighbors.incoming.length ? neighbors.incoming.join('; ') : 'none'));
+            lines.push('- Outgoing: ' + (neighbors.outgoing.length ? neighbors.outgoing.join('; ') : 'none'));
+          } else if (target.type === 'relationship') {
+            var source = byId[target.from];
+            var sink = byId[target.to];
+            lines.push('- From: ' + (source ? nodeLabel(source, target.from) : target.from) + ' (`' + target.from + '`)');
+            lines.push('- To: ' + (sink ? nodeLabel(sink, target.to) : target.to) + ' (`' + target.to + '`)');
+          } else {
+            var members = nodes().filter(function (node) {
+              var frame = targetElement(target);
+              if (!frame) return false;
+              var frameBox = localBox(frame);
+              var nodeBox = localBox(node);
+              if (!frameBox || !nodeBox) return false;
+              var cx = nodeBox.x + nodeBox.width / 2;
+              var cy = nodeBox.y + nodeBox.height / 2;
+              return cx >= frameBox.x && cx <= frameBox.x + frameBox.width && cy >= frameBox.y && cy <= frameBox.y + frameBox.height;
+            }).map(function (node) { return nodeLabel(node, node.getAttribute('data-node-id')) + ' (`' + node.getAttribute('data-node-id') + '`)'; });
+            lines.push('- Kind: ' + target.kind);
+            lines.push('- Contains: ' + (members.length ? members.join('; ') : 'no nodes detected'));
+          }
+          lines.push('');
+          lines.push('**Request:**');
+          note.text.split(/\r?\n/).forEach(function (line) { lines.push('> ' + line); });
+          lines.push('');
+        });
+        lines.push('```json');
+        lines.push(JSON.stringify({
+          diagram: title,
+          type: type,
+          notes: notes.map(function (note, index) {
+            var target = refreshTarget(note.target);
+            var entry = { index: index + 1, target: { type: target.type, id: target.id || null, label: target.label, kind: target.kind }, request: note.text };
+            if (target.type === 'relationship') { entry.target.from = target.from; entry.target.to = target.to; }
+            return entry;
+          })
+        }, null, 2));
+        lines.push('```');
+        return lines.join('\n');
+      }
+      function fallbackCopy(value) {
+        var field = document.createElement('textarea');
+        field.value = value;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        var copied = false;
+        try { copied = document.execCommand('copy'); } catch (_) { copied = false; }
+        field.remove();
+        return copied;
+      }
+      function copyReport() {
+        if (!notes.length) return Promise.resolve(false);
+        var value = report();
+        var copy = navigator.clipboard && typeof navigator.clipboard.writeText === 'function'
+          ? navigator.clipboard.writeText(value).then(function () { return true; }).catch(function () { return fallbackCopy(value); })
+          : Promise.resolve(fallbackCopy(value));
+        return copy.then(function (copied) {
+          copyBtn.textContent = viewerText(copied ? 'viewer.common.copied' : 'viewer.common.copyFailed');
+          setStatus(viewerText(copied ? 'viewer.notes.status.copied' : 'viewer.notes.status.copyFailed', { count: notes.length }));
+          clearTimeout(copyResetTimer);
+          copyResetTimer = setTimeout(function () { copyBtn.textContent = viewerText('viewer.notes.copy'); }, 1600);
+          return copied;
+        });
+      }
+
+      // ---- Mode and panel lifecycle -------------------------------------
+      function setEnabled(next) {
+        enabled = !!next;
+        if (enabled) html.setAttribute('data-change-notes-mode', 'on');
+        else html.removeAttribute('data-change-notes-mode');
+        updateTrigger();
+        return enabled;
+      }
+      function close(options) {
+        options = options || {};
+        panel.hidden = true;
+        setEnabled(false);
+        editing = null;
+        editor.hidden = true;
+        panel.removeAttribute('data-dock');
+        panel.style.left = '';
+        panel.style.top = '';
+        render();
+        if (options.restoreFocus !== false && opener && typeof opener.focus === 'function') opener.focus();
+        return false;
+      }
+      function open(options) {
+        options = options || {};
+        if (html.getAttribute('data-embed') === 'true') return false;
+        opener = options.opener || trigger;
+        if (Archify.exportMenu && Archify.exportMenu.isOpen()) Archify.exportMenu.close(false);
+        if (Archify.finder && Archify.finder.isOpen()) Archify.finder.close({ restoreFocus: false });
+        if (Archify.radar && Archify.radar.isOpen()) Archify.radar.close({ restoreFocus: false });
+        if (Archify.guide && Archify.guide.isOpen()) Archify.guide.close({ restoreFocus: false });
+        if (Archify.semanticLens && Archify.semanticLens.isOpen()) Archify.semanticLens.close({ restoreFocus: false });
+        panel.hidden = false;
+        setEnabled(true);
+        if (!editing) setStatus(viewerText('viewer.notes.status.ready'));
+        render();
+        dockPanel();
+        if (!options.focusEditor) closeBtn.focus();
+        return true;
+      }
+      function toggle() { return panel.hidden ? open({ opener: trigger }) : close(); }
+      function isOpen() { return !panel.hidden; }
+
+      // ---- Events ----------------------------------------------------------
+      svg.addEventListener('click', function (event) {
+        if (!enabled) return;
+        if (container.getAttribute('data-just-panned') === 'true') return;
+        var target = resolveTarget(event.target);
+        if (!target) return;
+        event.preventDefault();
+        event.stopPropagation();
+        openEditor(target);
+      }, true);
+      svg.addEventListener('keydown', function (event) {
+        if (!enabled || (event.key !== 'Enter' && event.key !== ' ')) return;
+        var target = resolveTarget(event.target);
+        if (!target) return;
+        event.preventDefault();
+        event.stopPropagation();
+        openEditor(target);
+      }, true);
+      trigger.addEventListener('click', toggle);
+      closeBtn.addEventListener('click', function () { close(); });
+      saveBtn.addEventListener('click', saveEditor);
+      deleteBtn.addEventListener('click', deleteEditing);
+      cancelBtn.addEventListener('click', function () { closeEditor(); });
+      copyBtn.addEventListener('click', function () { copyReport(); });
+      clearBtn.addEventListener('click', clearAll);
+      list.addEventListener('click', function (event) {
+        var button = event.target.closest('[data-change-note-id]');
+        if (!button) return;
+        editNote(button.getAttribute('data-change-note-id'));
+      });
+      textarea.addEventListener('keydown', function (event) {
+        if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+          event.preventDefault();
+          saveEditor();
+        }
+      });
+      panel.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        event.stopPropagation();
+        if (editing) closeEditor();
+        else close();
+      });
+      window.addEventListener('resize', function () {
+        if (notes.length) renderMarkers();
+        if (!panel.hidden) dockPanel();
+      });
+
+      storageKey = STORAGE_PREFIX + topologyDigest();
+      notes = readStored();
+      render();
+
+      return {
+        open: open,
+        close: close,
+        toggle: toggle,
+        isOpen: isOpen,
+        enabled: function () { return enabled; },
+        editing: function () { return !!editing; },
+        closeEditor: closeEditor,
+        annotate: function (element) {
+          var target = resolveTarget(element);
+          return target ? openEditor(target) : false;
+        },
+        notes: function () { return notes.map(function (note) { return { id: note.id, target: note.target, text: note.text }; }); },
+        report: report,
+        copy: copyReport,
+        clear: clearAll,
+        storageKey: function () { return storageKey; }
+      };
+    })();
+
+    /* ============================================================
        Diagram Guide — a factual command deck over existing interactions.
        Counts come from compiled semantics; actions delegate to Finder, Route
        Probe, Semantic Radar, Semantic Lens, Story Trail, Presentation, theme, export, and
@@ -14741,6 +16013,9 @@
       } else if (e.key === 'l' || e.key === 'L') {
         e.preventDefault();
         Archify.semanticLens.toggle();
+      } else if (e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        Archify.changeNotes.toggle();
       } else if (e.key === 'r' || e.key === 'R') {
         e.preventDefault();
         Archify.routeProbe.toggle({ focusNode: true });
@@ -14756,6 +16031,12 @@
       } else if (e.key === 'Escape' && Archify.preset.isOpen()) {
         e.preventDefault();
         Archify.preset.close(true);
+      } else if (e.key === 'Escape' && Archify.changeNotes.editing()) {
+        e.preventDefault();
+        Archify.changeNotes.closeEditor();
+      } else if (e.key === 'Escape' && Archify.changeNotes.isOpen()) {
+        e.preventDefault();
+        Archify.changeNotes.close({ restoreFocus: true });
       } else if (e.key === 'Escape' && Archify.semanticLens.isOpen()) {
         e.preventDefault();
         Archify.semanticLens.close({ restoreFocus: true });

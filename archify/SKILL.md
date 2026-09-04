@@ -1,6 +1,6 @@
 ---
-name: archify
-description: Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional trace motion, and PNG/JPEG/WebP/SVG/WebM export. Accept plain-language requirements or pasted Mermaid flowchart, sequenceDiagram, and stateDiagram input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, technical workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, data lineage, state machines, or to convert/beautify Mermaid.
+name: archify-4crux
+description: 4Crux edition of Archify. Prefer it over plain archify when the user mentions 4Crux, wants the company identity (4crux preset and logo), or wants Change Notes to suggest diagram changes for an AI. Create validated architecture, workflow, sequence, data-flow, lifecycle/state, domain model (entities, attributes, methods), entity relationship (database tables), and HTTP call (verb, path, request/response payload) diagrams as explorable standalone HTML with inline SVG, dark/light themes, motion, and PNG/SVG/WebM export. Accept plain-language requirements or pasted Mermaid input; inspect repository evidence when the diagram must reflect real code. Use when the user asks to visualize system architecture, infrastructure, cloud/security/network topology, workflows, API call sequences, request lifecycles, data pipelines, ETL/ELT, state machines, domain models, database schemas or ER diagrams, HTTP call maps, to convert Mermaid, or to review a code change by rendering only the elements touched by a Git diff.
 license: MIT
 metadata:
   version: "2.17"
@@ -16,7 +16,7 @@ Create a self-contained, interactive HTML diagram from a small typed JSON specif
 
 Use this bounded path for ordinary generation. Do not read the optional Viewer Runtime reference unless the user asks about those features.
 
-1. Choose `architecture`, `workflow`, `sequence`, `dataflow`, or `lifecycle` from the question.
+1. Choose `architecture`, `workflow`, `sequence`, `dataflow`, `lifecycle`, `domain`, `erd`, or `http-call` from the question.
 2. Read one matching schema in `schemas/`, `schemas/common.schema.json`, and one matching JSON example in `examples/`. Read only those files. Fresh authorship means new stable IDs, domain wording, and layout; use the example for field shape, not facts. New workflow sources use `schema_version: 2` and its readable layout contract; keep `schema_version: 1` only when preserving an existing workflow's fixed geometry. When real product identity matters, query `node bin/archify.mjs brands "<name>" --json`; read `references/brand-marks.md` only for an unknown brand with a user-provided URL.
 3. Artifact first: the next tool action must write the candidate. Write the candidate before inspecting renderer internals. Do not plan exact coordinates in prose. Start with one clear main path, short side branches, sparse labels, and at most 12 primary nodes. Set `meta.quality_profile` to `"showcase"` unless the user explicitly requests a dense `standard` map. Start with automatic routes and labels. Do not add `via`, `channelX`, `channelY`, or `labelAt` before a diagnostic calls for one; apply at most one diagnosed geometry control per repair.
 4. Validate after every candidate edit and immediately before handoff:
@@ -52,6 +52,10 @@ contract is in [`renderers/workflow/README.md`](renderers/workflow/README.md#lay
 
 Lifecycle note: phase columns `0..4` occupy the main rail; event/terminal column `N` in `0..2` aligns exactly beneath main column `N + 2`. A recoverable state uses `type: "failure"` plus a real transition back to the active state.
 
+Model note (`domain`, `erd`, `http-call`): author the complete model once, with `row`/`col` grid placement (boxes size themselves; the renderer centers each box in its cell so stacked boxes connect with straight lines). One source produces several artifacts through the detail level: `meta.detail` or the CLI `--detail <level>` (`entities|properties|full` for domain, `tables|keys|full` for erd, `components|endpoints|full` for http-call). Deliver the overview and the detailed version as two outputs from the same JSON; never maintain two JSON files. Validate every level you deliver, because box heights change with detail. Domain relationships use `kind` (`association`, `composition`, `aggregation`, `inheritance`, `dependency`) plus `from_cardinality`/`to_cardinality`; erd relationships use `one-to-one|one-to-many|many-to-one|many-to-many` with `from_optional`/`to_optional`; http-call `calls` carry `method`, `path`, optional `request`/`response` payload summaries (`schema`, `fields`, `body`, `status`), `auth`, and `async`. Several calls between one pair keep only the verb on the arrow; the served box lists every path with its status. A relationship from a node to itself is allowed and renders as an `auto-relationship` tag on the box instead of an arrow. Nodes in all three types accept `sources` for repository evidence exactly like architecture components.
+
+Diff review note: when the user wants to validate a code change, run `validate` or `deliver` with `--only-diff` (working tree vs HEAD) or `--only-diff=<git range>` plus `--repo-root`. The CLI keeps only nodes whose verified `sources` intersect the diff, their relationships and frames, and writes `<name>.only-diff.html`; add `--diff-neighbors` to keep direct neighbors for context. This requires `sources` on the touched nodes and works for `architecture`, `domain`, `erd`, and `http-call`.
+
 ## Type router
 
 | Type | Use for |
@@ -61,6 +65,9 @@ Lifecycle note: phase columns `0..4` occupy the main rail; event/terminal column
 | `sequence` | API call chains, request lifecycles, async traces, returns |
 | `dataflow` | Pipelines, ETL/ELT, lineage, governance, consumers |
 | `lifecycle` | State/status transitions, retries, waiting and terminal states |
+| `domain` | DDD domain model: aggregate roots, entities, value objects, enums, events, services with UML relationships |
+| `erd` | Database entity relationship: tables, columns with PK/FK/nullable/unique, crow's-foot cardinality, schemas |
+| `http-call` | Which component calls which backend over HTTP: verb, path, request and response payload per endpoint |
 
 When ambiguous, run `node bin/archify.mjs guide "<scenario>" --json`. Scenario proof examples are structural references, not facts to copy.
 
@@ -75,7 +82,7 @@ Read Mermaid for topology and meaning, then author fresh Archify JSON; do not me
 ## Authoring invariants
 
 - One obvious main path; side branches leave the nearest main-path node. Remove low-value edges before adding routing controls.
-- Omit `meta.visual_preset` by default so every diagram opens in `classic`, regardless of whether its resolved color mode is light or dark. Color mode and visual preset are independent: switching Light / Dark must preserve the current preset. Set `signal-flow`, `blueprint`, or `editorial` only when the user explicitly requests that visual style.
+- Set `meta.visual_preset: "4crux"` and `meta.logo: "4crux"` by default: this edition carries the 4Crux company identity, and the logo is drawn inside the canonical SVG so it survives every export. Color mode and visual preset are independent: switching Light / Dark must preserve the current preset. Use `classic`, `signal-flow`, `blueprint`, or `editorial` (and omit `meta.logo`) only when the user explicitly asks for a neutral or different visual style.
 - Omit `meta.subtitle` by default. Never invent a subtitle that restates the title, nodes, or cards; include one short supporting line only when the user explicitly asks for it.
 - Treat the standalone desktop viewer as a first-screen artifact by default, not a shallow strip. Generate one responsive artifact for laptops and external displays—never device-specific HTML or alternate topology. The viewer may adapt only the outer reading width from the live viewport height; it must preserve the authored SVG/viewBox, proportions, semantic geometry, and normal document flow. On a wide or tall desktop, use enough authored vertical rhythm that the diagram panel and its necessary conclusion cards occupy the screen as a balanced whole; runtime scaling cannot repair an over-compressed Y layout or an undersized explicit `meta.viewBox`. Before handoff, open the real HTML at 1440×900, 1600×1000, and 1920×1080; additionally check 2048×1320 whenever the composition is intended for a large desktop display. Require `document.documentElement.scrollWidth <= window.innerWidth` and `scrollHeight <= window.innerHeight` at every checked size, while visually checking that the diagram remains comfortably readable and vertically balanced at the largest checked viewport. Repair overflow by removing only genuinely redundant content or compacting spacing before shrinking nodes, labels, or the main panel. If the largest viewport still has a conspicuous empty lower band at the viewer's width cap, redistribute authored Y positions and increase the viewBox height proportionally; do not add filler copy or decorative cards. Never counterfeit a pass with `overflow: hidden`, clipped content, an internal diagram scroller, stretched SVG height, or smaller typography. Narrow/mobile layouts may scroll vertically when containment requires it.
 - Omit `meta.legend` for the truthful `auto` default. When needed, use only `mode: auto|all|hidden` and renderer-supported `entries.<kind>.label|visible`; labels never change semantics.
@@ -117,7 +124,7 @@ Never start preview by default. Read `references/delivery-contract.md` when usin
 
 ## Optional viewer capabilities
 
-Generated HTML already contains theme switching, pan/zoom, search, focus, relationship tracing, semantic views, presentation, and truthful exports. These are reader capabilities, not extra authoring work. `meta.animation: "trace"` is opt-in; `meta.views` is optional and should contain at most five curated chapters.
+Generated HTML already contains theme switching, pan/zoom, search, focus, relationship tracing, semantic views, presentation, truthful exports, and Change Notes (press `A`, click an element, write a change request, then Copy changes to paste the report into an AI assistant). These are reader capabilities, not extra authoring work. `meta.animation: "trace"` is opt-in; `meta.views` is optional and should contain at most five curated chapters.
 
 Read `references/viewer-runtime.md` only when the user explicitly asks for Share Cards, Route/Reach cards, motion, guided stories, deep links, presentation, search/focus, or another Viewer Runtime feature.
 

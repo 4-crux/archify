@@ -131,6 +131,20 @@ test('editorial preset reaches every visual surface and all five typed renderers
   }
 });
 
+test('4crux preset reaches every visual surface and all five typed renderers', () => {
+  for (const [mode, example] of Object.entries(CASES)) {
+    const html = render(mode, example, null, '4crux');
+    assert.match(html, /<html lang="en" data-theme="dark" data-preset="4crux">/, mode);
+    assert.match(svgBlock(html), /data-preset="4crux"/, mode);
+    assert.match(html, /content: attr\(data-preset-badge-4crux\)/, mode);
+    assert.match(html, /data-preset-badge-4crux="4CRUX \/ SYSTEM MAP"/, mode);
+    assert.match(html, /\[data-preset="4crux"\]\[data-theme="dark"\]/, mode);
+    assert.match(html, /\[data-preset="4crux"\]\[data-theme="light"\]/, mode);
+    assert.match(html, /html\[data-preset="4crux"\] \.header-row::after/, mode);
+    assert.match(html, /data-preset-value="4crux"[^>]+role="menuitemradio"/, mode);
+  }
+});
+
 test('all five renderers add one geometry-neutral semantic sigil per primary node', () => {
   for (const [mode, example] of Object.entries(CASES)) {
     const source = JSON.parse(fs.readFileSync(path.join(skillRoot, 'examples', example), 'utf8'));

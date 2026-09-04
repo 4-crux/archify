@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { esc, renderDefinitions, renderSemanticSigil, textUnits } from '../shared/utils.mjs';
 import { animateAttr, focusEdgeAttrs, focusNodeAttrs, focusNodeTitle, loadDiagramWithBrandMarks, writeDiagram, svgAccessibleText, svgRootAttrs } from '../shared/cli.mjs';
+import { renderDiagramLogo } from '../shared/diagram-logo.mjs';
 import { throwDiagnosticProblems } from '../shared/diagnostics.mjs';
 import { resolveLegend, renderLegend as renderResolvedLegend } from '../shared/legend.mjs';
 import { availableNodeTextWidth, fittedNodeFontSize, minimumNodeTextWidth } from '../shared/text-fit.mjs';
@@ -546,7 +547,7 @@ ${[...states.values()].map(renderState).join('\n\n')}
 ${asArray(lifecycle.transitions).map(renderTransitionLabel).join('\n')}
 
         <!-- Legend -->
-${renderLegend()}
+${renderLegend()}${renderDiagramLogo(lifecycle.meta, viewBox)}
       </svg>`;
 }
 

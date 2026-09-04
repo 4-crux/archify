@@ -94,7 +94,7 @@ test('motion, camera, layered Escape, mobile, print, and embed boundaries stay e
   assert.match(template, /Archify\.motionGovernor\.claim\('route'/);
   assert.match(template, /reason: 'route-journey',[\s\S]*?maxScale: 1\.65,[\s\S]*?padding: 64,[\s\S]*?duration: 360/);
   assert.match(template, /Archify\.routeProbe\.pauseJourney\(\{ preserveElapsed: true, reason: reason \|\| 'manual' \}\)/);
-  assert.match(template, /event\.target\.closest\('\.diagram-nav, \.focus-chip, \.node-finder, \.diagram-guide, \.overview-map, \.route-probe, \.semantic-lens'\)/);
+  assert.match(template, /event\.target\.closest\('\.diagram-nav, \.focus-chip, \.node-finder, \.diagram-guide, \.overview-map, \.route-probe, \.semantic-lens, \.change-notes'\)/);
   assert.match(template, /reason: 'guide'/);
   assert.match(template, /window\.addEventListener\('beforeprint'[\s\S]*?pauseJourney/);
   assert.match(template, /function escapeRoute\(options\)[\s\S]*?return 'paused'[\s\S]*?return 'overview'[\s\S]*?return 'cleared'/);

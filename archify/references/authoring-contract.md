@@ -80,8 +80,19 @@ domain wording, and keep that authored override in the primary language.
 Omit `meta.visual_preset` by default. The renderer then opens the diagram in
 `classic` for both light and dark color modes. Color mode and visual preset are
 independent viewer state: switching Light / Dark must preserve the current
-preset. Author `signal-flow`, `blueprint`, or `editorial` only when the user
-explicitly requests that visual style.
+preset. Author `signal-flow`, `blueprint`, `editorial`, or `4crux` only when
+the user explicitly requests that visual style.
+
+## Diagram logo
+
+Omit `meta.logo` by default. `meta.logo: "4crux"` draws the 4Crux logomark
+and wordmark as real SVG in the bottom-right margin of the canonical diagram,
+so it survives PNG, SVG, WebM, and Share Card export. The mark reads its colors
+from the `--logo-plate`, `--logo-ink`, and `--logo-word` variables, which follow
+the color mode but never the semantic node palette. The logo is independent
+from `meta.visual_preset`: authored geometry stays byte-identical across every
+preset, and switching presets in the viewer never adds or removes the mark.
+Pair it with the `4crux` preset for the full company identity.
 
 ## Engineering profile default
 
@@ -176,14 +187,38 @@ Event/terminal column `N` aligns to the same x coordinate as main column
 `N + 2`. A recoverable failure needs a real transition back to an active state.
 A card or guided view saying “retry” is not topology.
 
+## Model diagrams (domain, erd, http-call)
+
+All three share one compiler. Boxes measure themselves from their visible
+rows, so authored placement is a grid (`row`, `col`) or a free `pos`; the
+renderer centers boxes in their cells, infers relationship sides from the
+dominant axis between centers, and routes with the same orthogonal rules as
+architecture. Frames (`contexts`, `groups`, `zones`) must contain only the
+boxes they wrap and must be disjoint or nested. A relationship whose `from`
+and `to` are the same node draws no arrow: the box gets an
+`⟲ auto-relationship` tag (with the label, or the verb and path for HTTP),
+and the full facts, including kind and cardinalities, stay on the
+relationship for the passport and Change Notes. Detail levels remove member rows and shrink boxes; they never
+change ids, relationships, or placement. Labels default to the longest
+segment; parallel relationships between one pair stack their labels outward
+from the bundle, and bundled HTTP calls keep only the verb on the arrow.
+Fonts scale up automatically until member rows stay legible on a 1440px
+desktop for the final viewBox, and the auto viewBox keeps at least a 2:1
+landscape ratio so the first screen holds the whole model.
+
 ## Repository evidence
 
 When an architecture diagram must reflect real code, inspect repository
 entrypoints, runtime boundaries, storage, transports, and deployment
 configuration before authoring. Record only evidence you actually verified.
-`--repo-root <path>` is architecture-only and is accepted by architecture
-`render`, `validate`, `deliver`, `preview`, and `compare`; workflow, sequence,
-dataflow, and lifecycle reject it. Never infer runtime causality from file
+`--repo-root <path>` is accepted for architecture, domain, erd, and http-call
+`render`, `validate`, `deliver`, and `preview` (and architecture `compare`);
+workflow, sequence, dataflow, and lifecycle reject it. `--only-diff[=range]`
+projects an evidence-backed diagram onto the nodes whose `sources` intersect
+that Git diff before rendering; `--diff-neighbors` keeps their direct
+neighbors. The projection compacts the grid, filters relationships, frames,
+and guided views, drops cards, and records `diffProjection` in the JSON
+receipt. Never infer runtime causality from file
 proximity or naming alone.
 
 ## Hand-placed fallback

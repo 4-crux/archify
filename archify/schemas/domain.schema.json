@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/tt-a1i/archify/schemas/domain.schema.json",
+  "title": "Archify Domain Model Diagram",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "diagram_type", "meta", "entities", "relationships"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "diagram_type": { "const": "domain" },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "locale": { "$ref": "common.schema.json#/$defs/locale" },
+        "subtitle": { "type": "string" },
+        "output": { "type": "string" },
+        "animation": { "$ref": "common.schema.json#/$defs/animation" },
+        "visual_preset": { "$ref": "common.schema.json#/$defs/visualPreset" },
+        "logo": { "$ref": "common.schema.json#/$defs/diagramLogo" },
+        "quality_profile": { "$ref": "common.schema.json#/$defs/qualityProfile" },
+        "detail": { "enum": ["entities", "properties", "full"] },
+        "repository": { "$ref": "common.schema.json#/$defs/repository" },
+        "viewBox": {
+          "type": "array",
+          "prefixItems": [{ "type": "number", "minimum": 420 }, { "type": "number", "minimum": 566 }],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "views": { "$ref": "common.schema.json#/$defs/guidedViews" },
+        "legend": { "$ref": "common.schema.json#/$defs/modelLegend" }
+      }
+    },
+    "layout": { "$ref": "common.schema.json#/$defs/modelLayout" },
+    "contexts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "wraps"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id" },
+          "label": { "type": "string", "minLength": 1, "maxLength": 60 },
+          "kind": { "enum": ["bounded-context", "aggregate", "module"] },
+          "wraps": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "common.schema.json#/$defs/id" }
+          },
+          "pad": { "type": "number", "minimum": 8, "maximum": 80 }
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "label"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id" },
+          "kind": { "enum": ["aggregate-root", "entity", "value-object", "enum", "domain-event", "domain-service"] },
+          "label": { "type": "string", "minLength": 1, "maxLength": 48 },
+          "stereotype": { "type": "string", "minLength": 1, "maxLength": 32 },
+          "note": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "row": { "type": "integer", "minimum": 0 },
+          "col": { "type": "integer", "minimum": 0 },
+          "pos": { "$ref": "common.schema.json#/$defs/point" },
+          "width": { "type": "number", "minimum": 100, "maximum": 400 },
+          "attributes": {
+            "type": "array",
+            "maxItems": 24,
+            "items": { "$ref": "common.schema.json#/$defs/modelAttribute" }
+          },
+          "methods": {
+            "type": "array",
+            "maxItems": 24,
+            "items": { "$ref": "common.schema.json#/$defs/modelMethod" }
+          },
+          "sources": { "$ref": "common.schema.json#/$defs/sources" }
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from", "to", "kind"],
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id" },
+          "from": { "$ref": "common.schema.json#/$defs/id" },
+          "to": { "$ref": "common.schema.json#/$defs/id" },
+          "kind": { "enum": ["association", "composition", "aggregation", "inheritance", "dependency"] },
+          "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "from_cardinality": { "$ref": "common.schema.json#/$defs/cardinality" },
+          "to_cardinality": { "$ref": "common.schema.json#/$defs/cardinality" },
+          "fromSide": { "$ref": "common.schema.json#/$defs/modelSide" },
+          "toSide": { "$ref": "common.schema.json#/$defs/modelSide" },
+          "route": { "enum": ["auto", "straight", "orthogonal-h", "orthogonal-v"] },
+          "via": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 6,
+            "items": { "$ref": "common.schema.json#/$defs/point" }
+          },
+          "labelAt": { "$ref": "common.schema.json#/$defs/point" },
+          "labelSegment": { "type": "integer", "minimum": 0 },
+          "labelDx": { "type": "number" },
+          "labelDy": { "type": "number" }
+        }
+      }
+    },
+    "cards": { "$ref": "common.schema.json#/$defs/cards" }
+  }
+}

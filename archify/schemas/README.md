@@ -29,9 +29,22 @@ locale values fail schema validation instead of being guessed or silently
 rewritten.
 `visual_preset` accepts `classic` (the stable default), `signal-flow` (luminous
 motion-forward presentation), `blueprint` (high-contrast engineering review),
-or `editorial` (warm publication-style design review and documentation).
+`editorial` (warm publication-style design review and documentation), or
+`4crux` (4Crux company identity palette with higher-contrast semantic accents).
 Presets change only viewer styling; they do not alter semantic IDs or geometry.
-Sequence `meta` additionally accepts `column_fit`. The default `fixed` keeps
+`logo` optionally names a catalogued diagram-level logo (`4crux`); the renderer
+emits it as real SVG in the bottom-right margin so it survives every export,
+and it never changes authored geometry or semantic IDs.
+`domain`, `erd`, and `http-call` share the model contract: `layout.mode: grid`
+with `cols`, `gapX`, `gapY`; boxes placed by `row`/`col` (or free `pos`) with
+optional `width`; grouping frames (`contexts`, `groups`, `zones`) that `wrap`
+ids; `meta.detail` selecting the authored detail level; and node-level
+`sources` for repository evidence. Domain entities carry `kind`,
+`attributes` (`name`, `type`, `visibility`, `static`), and `methods` (`name`,
+`params`, `returns`); erd tables carry `columns` (`name`, `type`, `pk`, `fk`,
+`nullable`, `unique`, `ref`); http-call components carry `base_url`, and
+`calls` carry `method`, `path`, `auth`, `async`, and `request`/`response`
+payload summaries. Sequence `meta` additionally accepts `column_fit`. The default `fixed` keeps
 the historical 108px column gap and 86px participant boxes, so an authored
 diagram renders at the same coordinates no matter how wide its viewBox is.
 `spread` derives the gap and box width from the viewBox instead, which turns a

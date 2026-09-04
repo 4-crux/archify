@@ -1,0 +1,376 @@
+{
+  "schema_version": 1,
+  "diagram_type": "domain",
+  "meta": {
+    "title": "Order Management Domain",
+    "output": "examples/domain-order-management.html",
+    "quality_profile": "showcase",
+    "detail": "full",
+    "views": [
+      {
+        "id": "ordering",
+        "label": "Ordering aggregate",
+        "focus": [
+          "order",
+          "orderLine",
+          "money",
+          "orderStatus"
+        ],
+        "note": "The Order aggregate root owns its lines and status transitions."
+      },
+      {
+        "id": "fulfilment",
+        "label": "Fulfilment handoff",
+        "focus": [
+          "order",
+          "orderPlaced",
+          "shipment",
+          "pricingService"
+        ],
+        "note": "Placing an order raises an event that fulfilment consumes."
+      }
+    ]
+  },
+  "layout": {
+    "mode": "grid",
+    "cols": 5,
+    "gapX": 60,
+    "gapY": 52
+  },
+  "contexts": [
+    {
+      "id": "ordering",
+      "label": "Ordering context",
+      "kind": "bounded-context",
+      "wraps": [
+        "order",
+        "orderLine",
+        "money",
+        "orderStatus",
+        "customer",
+        "pricingService",
+        "orderPlaced"
+      ]
+    },
+    {
+      "id": "fulfilment",
+      "label": "Fulfilment context",
+      "kind": "bounded-context",
+      "wraps": [
+        "shipment",
+        "carrier"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "id": "customer",
+      "kind": "entity",
+      "label": "Customer",
+      "row": 0,
+      "col": 0,
+      "attributes": [
+        {
+          "name": "Id",
+          "type": "CustomerId"
+        },
+        {
+          "name": "Name",
+          "type": "string"
+        },
+        {
+          "name": "Email",
+          "type": "Email"
+        }
+      ],
+      "methods": [
+        {
+          "name": "ChangeEmail",
+          "params": "Email next"
+        }
+      ]
+    },
+    {
+      "id": "order",
+      "kind": "aggregate-root",
+      "label": "Order",
+      "row": 0,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "Id",
+          "type": "OrderId"
+        },
+        {
+          "name": "CustomerId",
+          "type": "CustomerId"
+        },
+        {
+          "name": "Status",
+          "type": "OrderStatus"
+        },
+        {
+          "name": "Total",
+          "type": "Money"
+        },
+        {
+          "name": "_lines",
+          "type": "List<OrderLine>",
+          "visibility": "private"
+        }
+      ],
+      "methods": [
+        {
+          "name": "AddLine",
+          "params": "Sku sku, int qty",
+          "returns": "void"
+        },
+        {
+          "name": "Place",
+          "returns": "Result"
+        },
+        {
+          "name": "Cancel",
+          "params": "Reason reason",
+          "returns": "Result"
+        }
+      ]
+    },
+    {
+      "id": "orderLine",
+      "kind": "entity",
+      "label": "OrderLine",
+      "row": 0,
+      "col": 2,
+      "attributes": [
+        {
+          "name": "Sku",
+          "type": "Sku"
+        },
+        {
+          "name": "Quantity",
+          "type": "int"
+        },
+        {
+          "name": "UnitPrice",
+          "type": "Money"
+        }
+      ],
+      "methods": [
+        {
+          "name": "Subtotal",
+          "returns": "Money"
+        }
+      ]
+    },
+    {
+      "id": "money",
+      "kind": "value-object",
+      "label": "Money",
+      "row": 0,
+      "col": 3,
+      "attributes": [
+        {
+          "name": "Amount",
+          "type": "decimal"
+        },
+        {
+          "name": "Currency",
+          "type": "Currency"
+        }
+      ],
+      "methods": [
+        {
+          "name": "Add",
+          "params": "Money other",
+          "returns": "Money"
+        }
+      ]
+    },
+    {
+      "id": "orderStatus",
+      "kind": "enum",
+      "label": "OrderStatus",
+      "row": 1,
+      "col": 1,
+      "attributes": [
+        {
+          "name": "Draft"
+        },
+        {
+          "name": "Placed"
+        },
+        {
+          "name": "Cancelled"
+        },
+        {
+          "name": "Shipped"
+        }
+      ]
+    },
+    {
+      "id": "pricingService",
+      "kind": "domain-service",
+      "label": "PricingService",
+      "row": 1,
+      "col": 0,
+      "methods": [
+        {
+          "name": "Quote",
+          "params": "Order order",
+          "returns": "Money"
+        }
+      ]
+    },
+    {
+      "id": "orderPlaced",
+      "kind": "domain-event",
+      "label": "OrderPlaced",
+      "row": 1,
+      "col": 2,
+      "attributes": [
+        {
+          "name": "OrderId",
+          "type": "OrderId"
+        },
+        {
+          "name": "PlacedAt",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "id": "shipment",
+      "kind": "aggregate-root",
+      "label": "Shipment",
+      "row": 1,
+      "col": 4,
+      "attributes": [
+        {
+          "name": "Id",
+          "type": "ShipmentId"
+        },
+        {
+          "name": "OrderId",
+          "type": "OrderId"
+        },
+        {
+          "name": "Carrier",
+          "type": "Carrier"
+        }
+      ],
+      "methods": [
+        {
+          "name": "Dispatch",
+          "returns": "Result"
+        }
+      ]
+    },
+    {
+      "id": "carrier",
+      "kind": "value-object",
+      "label": "Carrier",
+      "row": 0,
+      "col": 4,
+      "attributes": [
+        {
+          "name": "Code",
+          "type": "string"
+        },
+        {
+          "name": "TrackingUrl",
+          "type": "Uri"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": "customer-orders",
+      "from": "customer",
+      "to": "order",
+      "kind": "association",
+      "label": "places",
+      "from_cardinality": "1",
+      "to_cardinality": "0..*"
+    },
+    {
+      "id": "order-lines",
+      "from": "order",
+      "to": "orderLine",
+      "kind": "composition",
+      "from_cardinality": "1",
+      "to_cardinality": "1..*"
+    },
+    {
+      "id": "line-money",
+      "from": "orderLine",
+      "to": "money",
+      "kind": "association",
+      "label": "priced in"
+    },
+    {
+      "id": "order-status",
+      "from": "order",
+      "to": "orderStatus",
+      "kind": "association"
+    },
+    {
+      "id": "pricing-order",
+      "from": "pricingService",
+      "to": "order",
+      "kind": "dependency",
+      "label": "quotes"
+    },
+    {
+      "id": "order-placed",
+      "from": "order",
+      "to": "orderPlaced",
+      "kind": "dependency",
+      "label": "raises",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "placed-shipment",
+      "from": "orderPlaced",
+      "to": "shipment",
+      "kind": "dependency",
+      "label": "triggers"
+    },
+    {
+      "id": "shipment-carrier",
+      "from": "shipment",
+      "to": "carrier",
+      "kind": "aggregation",
+      "from_cardinality": "1",
+      "to_cardinality": "1"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Aggregates",
+      "dot": "emerald",
+      "items": [
+        "Order owns lines, status, and totals",
+        "Shipment is created from OrderPlaced"
+      ]
+    },
+    {
+      "title": "Value objects",
+      "dot": "violet",
+      "items": [
+        "Money is immutable and currency-aware",
+        "Carrier carries tracking metadata"
+      ]
+    },
+    {
+      "title": "Boundaries",
+      "dot": "amber",
+      "items": [
+        "Ordering and Fulfilment only share the event",
+        "PricingService is stateless"
+      ]
+    }
+  ]
+}

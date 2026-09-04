@@ -2,6 +2,17 @@
 
 All notable changes are documented here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## 4Crux fork (unreleased)
+
+### Added
+- **4Crux visual preset and diagram logo.** `meta.visual_preset: "4crux"` and `meta.logo: "4crux"`; the mark is real SVG, so it survives every export.
+- **Change Notes.** Press `A` or use the NOTES dock button, click a node, frame, or relationship, write a change request, and copy every note as one Markdown report for an AI assistant. Notes stay in browser storage and never enter exports.
+- **Model diagram types.** `domain` (DDD model with UML notation and cardinalities), `erd` (tables with PK/FK/nullable/unique columns and crow's-foot ends), and `http-call` (components, verb-and-path calls, request/response payload rows) share one compiler. `--detail <level>` renders overview or detailed artifacts from one source.
+- **Diff review.** Repository evidence (`sources`) now applies to `domain`, `erd`, and `http-call`; `--only-diff[=range]` plus `--diff-neighbors` render only the elements touched by a Git diff.
+
+### Changed
+- Structural frames carry `data-composition-frame-label`; the artifact declares its diagram type in a `<meta name="archify-diagram-type">` tag.
+
 ## [Unreleased]
 
 > Development identity: `v2.17.0-dev.1`. Not a stable release.
